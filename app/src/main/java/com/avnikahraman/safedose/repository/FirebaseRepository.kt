@@ -1,0 +1,351 @@
+package com.avnikahraman.safedose.repository
+
+import com.avnikahraman.safedose.models.Alarm
+import com.avnikahraman.safedose.models.Medicine
+import com.avnikahraman.safedose.models.User
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import kotlinx.coroutines.tasks.await
+
+/**
+ * Firebase işlemlerini yöneten Repository sınıfı
+ * Singleton pattern kullanılıyor
+ */
+class FirebaseRepository private constructor() {
+
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+
+    // Firestore collection referansları
+    private val usersCollection = firestore.collection("users")
+    private val medicinesCollection = firestore.collection("medicines")
+    private val alarmsCollection = firestore.collection("alarms")
+
+    companion object {
+        @Volatile
+        private var instance: FirebaseRepository? = null
+
+        fun getInstance(): FirebaseRepository {
+            return instance ?: synchronized(this) {
+                instance ?: FirebaseRepository().also { instance = it }
+            }
+        }
+    }
+
+    // ==================== AUTHENTICATION ====================
+
+    /**
+     * Email ve şifre ile giriş yap
+     */
+    suspend fun signInWithEmail(email: String, password: String): Result<FirebaseUser> {
+        return try {
+            val result = auth.signInWithEmailAndPassword(email, password).await()
+            result.user?.let {
+                updateLastLogin(it.uid)
+                Result.success(it)
+            } ?: Result.failure(Exception("Kullanıcı bulunamadı"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Email ve şifre ile kayıt ol
+     */
+    suspend fun signUpWithEmail(email: String, password: String, name: String): Result<FirebaseUser> {
+        return try {
+            val result = auth.createUserWithEmailAndPassword(email, password).await()
+            result.user?.let { firebaseUser ->
+                // Firestore'a kullanıcı bilgilerini kaydet
+                val user = User(
+                    id = firebaseUser.uid,
+                    email = email,
+                    name = name
+                )
+                saveUser(user)
+                Result.success(firebaseUser)
+            } ?: Result.failure(Exception("Kayıt başarısız"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Google ile giriş yap
+     */
+    suspend fun signInWithGoogle(idToken: String): Result<FirebaseUser> {
+        return try {
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            val result = auth.signInWithCredential(credential).await()
+            result.user?.let { firebaseUser ->
+                // Firestore'da kullanıcı yoksa oluştur
+                val userDoc = usersCollection.document(firebaseUser.uid).get().await()
+                if (!userDoc.exists()) {
+                    val user = User(
+                        id = firebaseUser.uid,
+                        email = firebaseUser.email ?: "",
+                        name = firebaseUser.displayName ?: "",
+                        profileImageUrl = firebaseUser.photoUrl?.toString() ?: ""
+                    )
+                    saveUser(user)
+                } else {
+                    updateLastLogin(firebaseUser.uid)
+                }
+                Result.success(firebaseUser)
+            } ?: Result.failure(Exception("Google girişi başarısız"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Çıkış yap
+     */
+    fun signOut() {
+        auth.signOut()
+    }
+
+    /**
+     * Şu anki kullanıcıyı al
+     */
+    fun getCurrentUser(): FirebaseUser? {
+        return auth.currentUser
+    }
+
+    /**
+     * Kullanıcı giriş yapmış mı?
+     */
+    fun isUserLoggedIn(): Boolean {
+        return auth.currentUser != null
+    }
+
+    // ==================== USER OPERATIONS ====================
+
+    /**
+     * Kullanıcıyı Firestore'a kaydet
+     */
+    private suspend fun saveUser(user: User) {
+        usersCollection.document(user.id).set(user).await()
+    }
+
+    /**
+     * Kullanıcı bilgilerini getir
+     */
+    suspend fun getUser(userId: String): Result<User> {
+        return try {
+            val snapshot = usersCollection.document(userId).get().await()
+            val user = snapshot.toObject(User::class.java)
+            user?.let {
+                Result.success(it)
+            } ?: Result.failure(Exception("Kullanıcı bulunamadı"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Son giriş zamanını güncelle
+     */
+    private suspend fun updateLastLogin(userId: String) {
+        usersCollection.document(userId)
+            .update("lastLoginAt", System.currentTimeMillis())
+            .await()
+    }
+
+    // ==================== MEDICINE OPERATIONS ====================
+
+    /**
+     * İlaç ekle
+     */
+    suspend fun addMedicine(medicine: Medicine): Result<String> {
+        return try {
+            val docRef = medicinesCollection.document()
+            val medicineWithId = medicine.copy(id = docRef.id)
+            docRef.set(medicineWithId).await()
+            Result.success(docRef.id)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Kullanıcının ilaçlarını getir
+     */
+    suspend fun getUserMedicines(userId: String): Result<List<Medicine>> {
+        return try {
+            val snapshot = medicinesCollection
+                .whereEqualTo("userId", userId)
+                .whereEqualTo("isActive", true)
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .get()
+                .await()
+            val medicines = snapshot.toObjects(Medicine::class.java)
+            Result.success(medicines)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * İlaç bilgilerini getir
+     */
+    suspend fun getMedicine(medicineId: String): Result<Medicine> {
+        return try {
+            val snapshot = medicinesCollection.document(medicineId).get().await()
+            val medicine = snapshot.toObject(Medicine::class.java)
+            medicine?.let {
+                Result.success(it)
+            } ?: Result.failure(Exception("İlaç bulunamadı"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * İlaç güncelle
+     */
+    suspend fun updateMedicine(medicine: Medicine): Result<Unit> {
+        return try {
+            medicinesCollection.document(medicine.id).set(medicine).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * İlaç sil (soft delete)
+     */
+    suspend fun deleteMedicine(medicineId: String): Result<Unit> {
+        return try {
+            medicinesCollection.document(medicineId)
+                .update("isActive", false)
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Barkoda göre ilaç ara
+     */
+    suspend fun getMedicineByBarcode(barcode: String, userId: String): Result<Medicine?> {
+        return try {
+            val snapshot = medicinesCollection
+                .whereEqualTo("barcode", barcode)
+                .whereEqualTo("userId", userId)
+                .whereEqualTo("isActive", true)
+                .limit(1)
+                .get()
+                .await()
+            val medicine = snapshot.toObjects(Medicine::class.java).firstOrNull()
+            Result.success(medicine)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // ==================== ALARM OPERATIONS ====================
+
+    /**
+     * Alarm ekle
+     */
+    suspend fun addAlarm(alarm: Alarm): Result<String> {
+        return try {
+            val docRef = alarmsCollection.document()
+            val alarmWithId = alarm.copy(id = docRef.id)
+            docRef.set(alarmWithId).await()
+            Result.success(docRef.id)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Kullanıcının alarmlarını getir
+     */
+    suspend fun getUserAlarms(userId: String): Result<List<Alarm>> {
+        return try {
+            val snapshot = alarmsCollection
+                .whereEqualTo("userId", userId)
+                .whereEqualTo("isActive", true)
+                .orderBy("hour")
+                .orderBy("minute")
+                .get()
+                .await()
+            val alarms = snapshot.toObjects(Alarm::class.java)
+            Result.success(alarms)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * İlaca ait alarmları getir
+     */
+    suspend fun getMedicineAlarms(medicineId: String): Result<List<Alarm>> {
+        return try {
+            val snapshot = alarmsCollection
+                .whereEqualTo("medicineId", medicineId)
+                .whereEqualTo("isActive", true)
+                .get()
+                .await()
+            val alarms = snapshot.toObjects(Alarm::class.java)
+            Result.success(alarms)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Alarm güncelle
+     */
+    suspend fun updateAlarm(alarm: Alarm): Result<Unit> {
+        return try {
+            alarmsCollection.document(alarm.id).set(alarm).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Alarm sil
+     */
+    suspend fun deleteAlarm(alarmId: String): Result<Unit> {
+        return try {
+            alarmsCollection.document(alarmId)
+                .update("isActive", false)
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * İlaca ait tüm alarmları sil
+     */
+    suspend fun deleteMedicineAlarms(medicineId: String): Result<Unit> {
+        return try {
+            val snapshot = alarmsCollection
+                .whereEqualTo("medicineId", medicineId)
+                .get()
+                .await()
+
+            val batch = firestore.batch()
+            snapshot.documents.forEach { doc ->
+                batch.update(doc.reference, "isActive", false)
+            }
+            batch.commit().await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+}

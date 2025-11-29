@@ -1,0 +1,58 @@
+<resources>
+    <string name="app_name">SafeDose</string>
+
+    <!--
+        Google Sign In için Web Client ID
+        Bu ID'yi Firebase Console'dan alman gerekiyor:
+        1. Firebase Console > Project Settings
+        2. General sekmesi
+        3. Your apps bölümünde Web app'i bul
+        4. Web client ID'yi kopyala
+        5. Aşağıya yapıştır
+
+        ÖRNEK:
+        <string name="default_web_client_id">123456789-abcdefg.apps.googleusercontent.com</string>
+    -->
+    <string name="default_web_client_id">YOUR_WEB_CLIENT_ID_HERE</string>
+
+    <!-- Login & Register Strings -->
+    <string name="login_title">Giriş Yap</string>
+    <string name="register_title">Kayıt Ol</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Şifre</string>
+    <string name="name_hint">Ad Soyad</string>
+    <string name="confirm_password_hint">Şifre Tekrar</string>
+    <string name="forgot_password">Şifremi Unuttum</string>
+    <string name="login_button">Giriş Yap</string>
+    <string name="register_button">Kayıt Ol</string>
+    <string name="google_sign_in">Google ile Giriş Yap</string>
+    <string name="google_register">Google ile Kayıt Ol</string>
+    <string name="no_account">Hesabın yok mu? Kayıt Ol</string>
+    <string name="have_account">Zaten hesabın var mı? Giriş Yap</string>
+    <string name="welcome_message">Hoş Geldiniz</string>
+
+    <!-- Error Messages -->
+    <string name="error_email_required">Email gerekli</string>
+    <string name="error_email_invalid">Geçerli bir email girin</string>
+    <string name="error_password_required">Şifre gerekli</string>
+    <string name="error_password_short">Şifre en az 6 karakter olmalı</string>
+    <string name="error_password_mismatch">Şifreler eşleşmiyor</string>
+    <string name="error_name_required">İsim gerekli</string>
+    <string name="error_name_short">İsim en az 2 karakter olmalı</string>
+    <string name="error_login_failed">Giriş başarısız</string>
+    <string name="error_register_failed">Kayıt başarısız</string>
+
+    <!-- Success Messages -->
+    <string name="success_login">Giriş başarılı!</string>
+    <string name="success_register">Kayıt başarılı! Hoş geldiniz!</string>
+    <string name="success_google_login">Google ile giriş başarılı!</string>
+    <string name="success_google_register">Google ile kayıt başarılı!</string>
+
+    <!-- Loading Messages -->
+    <string name="loading_login">Giriş yapılıyor…</string>
+    <string name="loading_register">Kayıt yapılıyor…</string>
+
+    <!-- Other Messages -->
+    <string name="google_sign_in_cancelled">Google girişi iptal edildi</string>
+    <string name="forgot_password_coming_soon">Şifre sıfırlama özelliği yakında eklenecek</string>
+</resources>
