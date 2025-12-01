@@ -1,0 +1,250 @@
+package com.avnikahraman.safedose.ui.medicines
+
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.avnikahraman.safedose.databinding.ActivityMedicineDetailBinding
+import com.avnikahraman.safedose.repository.FirebaseRepository
+import com.avnikahraman.safedose.utils.AlarmScheduler
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
+
+/**
+ * İlaç detay ekranı
+ * İlaç bilgilerini ve alarm detaylarını gösterir
+ */
+class MedicineDetailActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMedicineDetailBinding
+    private lateinit var repository: FirebaseRepository
+    private val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale("tr"))
+
+    private var medicineId: String = ""
+
+    companion object {
+        const val EXTRA_MEDICINE_ID = "medicine_id"
+        const val EXTRA_MEDICINE_NAME = "medicine_name"
+        const val EXTRA_MEDICINE_DOSAGE = "medicine_dosage"
+        const val EXTRA_MEDICINE_DESCRIPTION = "medicine_description"
+        const val EXTRA_MEDICINE_BARCODE = "medicine_barcode"
+        const val EXTRA_MEDICINE_TIMES_PER_DAY = "medicine_times_per_day"
+        const val EXTRA_MEDICINE_START_TIME = "medicine_start_time"
+        const val EXTRA_MEDICINE_INTERVAL_HOURS = "medicine_interval_hours"
+        const val EXTRA_MEDICINE_DURATION_DAYS = "medicine_duration_days"
+        const val EXTRA_MEDICINE_START_DATE = "medicine_start_date"
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        binding = ActivityMedicineDetailBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        repository = FirebaseRepository.getInstance()
+
+        // Intent'ten verileri al
+        medicineId = intent.getStringExtra(EXTRA_MEDICINE_ID) ?: ""
+        val name = intent.getStringExtra(EXTRA_MEDICINE_NAME) ?: ""
+        val dosage = intent.getStringExtra(EXTRA_MEDICINE_DOSAGE) ?: ""
+        val description = intent.getStringExtra(EXTRA_MEDICINE_DESCRIPTION) ?: ""
+        val barcode = intent.getStringExtra(EXTRA_MEDICINE_BARCODE) ?: ""
+        val timesPerDay = intent.getIntExtra(EXTRA_MEDICINE_TIMES_PER_DAY, 0)
+        val startTime = intent.getStringExtra(EXTRA_MEDICINE_START_TIME) ?: ""
+        val intervalHours = intent.getIntExtra(EXTRA_MEDICINE_INTERVAL_HOURS, 0)
+        val durationDays = intent.getIntExtra(EXTRA_MEDICINE_DURATION_DAYS, 0)
+        val startDate = intent.getLongExtra(EXTRA_MEDICINE_START_DATE, 0L)
+
+        // Toolbar setup
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = name
+
+        // Verileri göster
+        displayMedicineInfo(
+            name, dosage, description, barcode,
+            timesPerDay, startTime, intervalHours,
+            durationDays, startDate
+        )
+
+        // Click listeners
+        setupClickListeners()
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
+    }
+
+    /**
+     * İlaç bilgilerini göster
+     */
+    private fun displayMedicineInfo(
+        name: String,
+        dosage: String,
+        description: String,
+        barcode: String,
+        timesPerDay: Int,
+        startTime: String,
+        intervalHours: Int,
+        durationDays: Int,
+        startDate: Long
+    ) {
+        binding.apply {
+            // İlaç bilgileri
+            tvMedicineName.text = name
+            tvDosage.text = dosage
+            tvDescription.text = if (description.isNotEmpty()) description else "Açıklama eklenmemiş"
+            tvBarcode.text = barcode
+
+            // Kullanım bilgileri
+            tvTimesPerDay.text = "$timesPerDay defa"
+            tvStartTime.text = startTime
+            tvIntervalHours.text = "$intervalHours saat"
+            tvDurationDays.text = "$durationDays gün"
+
+            // Tarih bilgileri
+            val startDateStr = dateFormat.format(Date(startDate))
+            tvStartDate.text = startDateStr
+
+            val endDate = startDate + (durationDays * 24 * 60 * 60 * 1000L)
+            val endDateStr = dateFormat.format(Date(endDate))
+            tvEndDate.text = endDateStr
+
+            // Kalan gün
+            val daysRemaining = calculateDaysRemaining(endDate)
+            if (daysRemaining > 0) {
+                tvDaysRemaining.text = "$daysRemaining gün kaldı"
+                tvDaysRemaining.setTextColor(getColor(android.R.color.holo_green_dark))
+            } else {
+                tvDaysRemaining.text = "Tamamlandı"
+                tvDaysRemaining.setTextColor(getColor(android.R.color.darker_gray))
+            }
+
+            // Alarm saatleri listesi
+            val alarmTimes = calculateAlarmTimes(startTime, timesPerDay, intervalHours)
+            tvAlarmTimes.text = alarmTimes.joinToString("\n") { "🔔 $it" }
+        }
+    }
+
+    /**
+     * Kalan gün sayısını hesapla
+     */
+    private fun calculateDaysRemaining(endDate: Long): Int {
+        val currentTime = System.currentTimeMillis()
+        val remainingMillis = endDate - currentTime
+        val remainingDays = (remainingMillis / (1000 * 60 * 60 * 24)).toInt()
+        return maxOf(0, remainingDays)
+    }
+
+    /**
+     * Alarm saatlerini hesapla
+     */
+    private fun calculateAlarmTimes(
+        startTime: String,
+        timesPerDay: Int,
+        intervalHours: Int
+    ): List<String> {
+        val times = mutableListOf<String>()
+        val parts = startTime.split(":")
+        val hour = parts[0].toIntOrNull() ?: 0
+        val minute = parts[1].toIntOrNull() ?: 0
+
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, hour)
+            set(Calendar.MINUTE, minute)
+        }
+
+        for (i in 0 until timesPerDay) {
+            val h = calendar.get(Calendar.HOUR_OF_DAY)
+            val m = calendar.get(Calendar.MINUTE)
+            times.add(String.format("%02d:%02d", h, m))
+            calendar.add(Calendar.HOUR_OF_DAY, intervalHours)
+        }
+
+        return times
+    }
+
+    /**
+     * Click listener'ları ayarla
+     */
+    private fun setupClickListeners() {
+        // Sil butonu
+        binding.btnDelete.setOnClickListener {
+            showDeleteConfirmationDialog()
+        }
+    }
+
+    /**
+     * Silme onay dialogu
+     */
+    private fun showDeleteConfirmationDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("İlacı Sil")
+            .setMessage("Bu ilacı ve tüm alarmlarını silmek istediğinizden emin misiniz?")
+            .setPositiveButton("Evet, Sil") { _, _ ->
+                deleteMedicine()
+            }
+            .setNegativeButton("İptal", null)
+            .show()
+    }
+
+    /**
+     * İlacı sil
+     */
+    private fun deleteMedicine() {
+        binding.btnDelete.isEnabled = false
+        binding.btnDelete.text = "Siliniyor..."
+
+        lifecycleScope.launch {
+            try {
+                // İlacı sil (soft delete)
+                val deleteMedicineResult = repository.deleteMedicine(medicineId)
+
+                // İlaca ait alarmları sil
+                val deleteAlarmsResult = repository.deleteMedicineAlarms(medicineId)
+
+                // Android AlarmManager'dan da sil
+                val alarmsResult = repository.getMedicineAlarms(medicineId)
+                if (alarmsResult.isSuccess) {
+                    val alarms = alarmsResult.getOrNull() ?: emptyList()
+                    for (alarm in alarms) {
+                        AlarmScheduler.cancelAlarm(this@MedicineDetailActivity, alarm)
+                    }
+                }
+
+                runOnUiThread {
+                    if (deleteMedicineResult.isSuccess && deleteAlarmsResult.isSuccess) {
+                        Toast.makeText(
+                            this@MedicineDetailActivity,
+                            "İlaç başarıyla silindi",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        finish()
+                    } else {
+                        Toast.makeText(
+                            this@MedicineDetailActivity,
+                            "Silme işlemi başarısız",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        binding.btnDelete.isEnabled = true
+                        binding.btnDelete.text = "İlacı Sil"
+                    }
+                }
+
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(
+                        this@MedicineDetailActivity,
+                        "Hata: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    binding.btnDelete.isEnabled = true
+                    binding.btnDelete.text = "İlacı Sil"
+                }
+            }
+        }
+    }
+}

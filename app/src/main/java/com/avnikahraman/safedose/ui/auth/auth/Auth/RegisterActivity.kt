@@ -1,21 +1,22 @@
-package com.avnikahraman.safedose.ui.auth
+package com.avnikahraman.safedose.ui.auth.auth.Auth
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.avnikahraman.safedose.MainActivity
+import com.avnikahraman.safedose.R
+import com.avnikahraman.safedose.databinding.ActivityRegisterBinding
+import com.avnikahraman.safedose.repository.FirebaseRepository
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
-import com.avnikahraman.safedose.MainActivity
-import com.avnikahraman.safedose.R
-import com.avnikahraman.safedose.databinding.ActivityRegisterBinding
-import com.avnikahraman.safedose.repository.FirebaseRepository
 import kotlinx.coroutines.launch
 
 /**
@@ -44,7 +45,7 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Repository instance
-        repository = FirebaseRepository.getInstance()
+        repository = FirebaseRepository.Companion.getInstance()
 
         // Google Sign In yapılandırması
         setupGoogleSignIn()
@@ -129,7 +130,7 @@ class RegisterActivity : AppCompatActivity() {
             return false
         }
 
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             binding.etEmail.error = "Geçerli bir email girin"
             binding.etEmail.requestFocus()
             return false

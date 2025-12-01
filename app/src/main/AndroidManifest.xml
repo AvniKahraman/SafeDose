@@ -2,19 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.avnikahraman.safedose">
-
     <!-- Camera Feature -->
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="false" />
-
-    <!-- İzinler -->
+        android:required="false" /> <!-- İzinler -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -26,47 +24,49 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SafeDose"
         tools:targetApi="31">
-
-        <!-- Login Activity - LAUNCHER (Uygulama buradan başlayacak) -->
         <activity
-            android:name=".ui.auth.LoginActivity"
+            android:name=".MedicineDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Medicines"
+            android:exported="false" />
+        <activity
+            android:name=".MedicineDetail"
+            android:exported="false" />
+        <activity
+            android:name=".Medicine"
+            android:exported="false" /> <!-- Login Activity - LAUNCHER -->
+        <activity
+            android:name=".ui.auth.auth.Auth.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Register Activity -->
+        </activity> <!-- Register Activity -->
         <activity
-            android:name=".ui.auth.RegisterActivity"
-            android:exported="false" />
-
-        <!-- Main Activity -->
+            android:name=".ui.auth.auth.Auth.RegisterActivity"
+            android:exported="false" /> <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
-
-        <!-- Scanner Activity -->
+            android:exported="false" /> <!-- Scanner Activity -->
         <activity
-            android:name=".ui.scanner.ScannerActivity"
-            android:exported="false" />
-
-        <!-- Alarm Setup Activity -->
+            android:name=".ui.auth.auth.Auth.scanner.ScannerActivity"
+            android:exported="false" /> <!-- Alarm Setup Activity -->
         <activity
             android:name=".ui.alarm.AlarmSetupActivity"
-            android:exported="false" />
-
-        <!-- Medicines Activity -->
+            android:exported="false" /> <!-- Medicines Activity -->
         <activity
             android:name=".ui.medicines.MedicinesActivity"
-            android:exported="false" />
-
-        <!-- Medicine Detail Activity -->
+            android:exported="false" /> <!-- Medicine Detail Activity -->
         <activity
             android:name=".ui.medicines.MedicineDetailActivity"
+            android:exported="false" /> <!-- Alarm Receiver -->
+        <receiver
+            android:name=".utils.AlarmReceiver"
+            android:enabled="true"
             android:exported="false" />
-
     </application>
 
 </manifest>

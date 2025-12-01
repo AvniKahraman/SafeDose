@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardMedicine"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@android:color/holo_green_light">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- İlaç Emoji/Icon -->
+        <TextView
+            android:id="@+id/iconMedicine"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:text="💊"
+            android:textSize="36sp"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- İlaç Adı -->
+        <TextView
+            android:id="@+id/tvMedicineName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Aspirin"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:layout_marginStart="12dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintTop_toTopOf="@id/iconMedicine"
+            app:layout_constraintStart_toEndOf="@id/iconMedicine"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Dozaj -->
+        <TextView
+            android:id="@+id/tvDosage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="500mg"
+            android:textSize="14sp"
+            android:textColor="@android:color/white"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            app:layout_constraintTop_toBottomOf="@id/tvMedicineName"
+            app:layout_constraintStart_toEndOf="@id/iconMedicine"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Divider -->
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/white"
+            android:alpha="0.3"
+            android:layout_marginTop="12dp"
+            app:layout_constraintTop_toBottomOf="@id/iconMedicine" />
+
+        <!-- Kullanım Bilgisi -->
+        <TextView
+            android:id="@+id/tvUsageInfo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Günde 2x, 12 saat aralıkla"
+            android:textSize="14sp"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="12dp"
+            android:drawablePadding="8dp"
+            app:drawableStartCompat="@android:drawable/ic_menu_recent_history"
+            app:drawableTint="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@id/divider"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Başlangıç Saati -->
+        <TextView
+            android:id="@+id/tvStartTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="İlk doz: 08:00"
+            android:textSize="14sp"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="8dp"
+            android:drawablePadding="8dp"
+            app:drawableStartCompat="@android:drawable/ic_menu_recent_history"
+            app:drawableTint="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@id/tvUsageInfo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Alt Bilgiler Container -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp"
+            app:layout_constraintTop_toBottomOf="@id/tvStartTime">
+
+            <!-- Kalan Gün -->
+            <TextView
+                android:id="@+id/tvDaysRemaining"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="7 gün kaldı"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:background="#40FFFFFF"
+                android:padding="6dp"
+                android:gravity="center"
+                android:layout_marginEnd="4dp" />
+
+            <!-- Başlangıç Tarihi -->
+            <TextView
+                android:id="@+id/tvStartDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Başlangıç: 01 Oca 2025"
+                android:textSize="11sp"
+                android:textColor="@android:color/white"
+                android:background="#40FFFFFF"
+                android:padding="6dp"
+                android:gravity="center"
+                android:layout_marginStart="4dp" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>
