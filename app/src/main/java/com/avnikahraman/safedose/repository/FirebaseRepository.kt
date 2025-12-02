@@ -1,19 +1,15 @@
 package com.avnikahraman.safedose.repository
-
-import com.avnikahraman.safedose.models.Alarm
-import com.avnikahraman.safedose.models.Medicine
-import com.avnikahraman.safedose.models.User
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.avnikahraman.safedose.models.Alarm
+import com.avnikahraman.safedose.models.Medicine
+import com.avnikahraman.safedose.models.User
 import kotlinx.coroutines.tasks.await
 
-/**
- * Firebase işlemlerini yöneten Repository sınıfı
- * Singleton pattern kullanılıyor
- */
 class FirebaseRepository private constructor() {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -40,17 +36,35 @@ class FirebaseRepository private constructor() {
     /**
      * Email ve şifre ile giriş yap
      */
-    suspend fun signInWithEmail(email: String, password: String): Result<FirebaseUser> {
+    /**
+     * Email ve şifre ile giriş yap. Eğer kullanıcı Firestore'da yoksa oluştur.
+     */
+    suspend fun signInWithEmail(email: String, password: String, nameIfNew: String = "User"): Result<FirebaseUser> {
         return try {
             val result = auth.signInWithEmailAndPassword(email, password).await()
-            result.user?.let {
-                updateLastLogin(it.uid)
-                Result.success(it)
-            } ?: Result.failure(Exception("Kullanıcı bulunamadı"))
+            val firebaseUser = result.user ?: return Result.failure(Exception("Kullanıcı bulunamadı"))
+
+            // Firestore'da kullanıcı belgesi var mı kontrol et
+            val userDoc = usersCollection.document(firebaseUser.uid).get().await()
+            if (!userDoc.exists()) {
+                // Yoksa yeni kullanıcı oluştur
+                val user = User(
+                    id = firebaseUser.uid,
+                    email = firebaseUser.email ?: "",
+                    name = nameIfNew
+                )
+                saveUser(user)
+            }
+
+            // Son giriş zamanını güncelle
+            updateLastLogin(firebaseUser.uid)
+
+            Result.success(firebaseUser)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
+
 
     /**
      * Email ve şifre ile kayıt ol
@@ -162,11 +176,24 @@ class FirebaseRepository private constructor() {
      */
     suspend fun addMedicine(medicine: Medicine): Result<String> {
         return try {
+            val currentUser = auth.currentUser ?: return Result.failure(Exception("Kullanıcı oturumu yok"))
             val docRef = medicinesCollection.document()
-            val medicineWithId = medicine.copy(id = docRef.id)
-            docRef.set(medicineWithId).await()
+
+            val medicineWithFields = medicine.copy(
+                id = docRef.id,
+                userId = currentUser.uid,
+                active = true,  // DEĞİŞTİ
+                createdAt = System.currentTimeMillis()
+            )
+
+            docRef.set(medicineWithFields).await()
+
+            val check = docRef.get().await()
+            Log.d("FirebaseRepository", "Saved with active: ${check.getBoolean("active")}")  // DEĞİŞTİ
+
             Result.success(docRef.id)
         } catch (e: Exception) {
+            Log.e("FirebaseRepository", "Error: ${e.message}", e)
             Result.failure(e)
         }
     }
@@ -178,13 +205,16 @@ class FirebaseRepository private constructor() {
         return try {
             val snapshot = medicinesCollection
                 .whereEqualTo("userId", userId)
-                .whereEqualTo("isActive", true)
-                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .whereEqualTo("active", true)  // DEĞİŞTİ
                 .get()
                 .await()
+
             val medicines = snapshot.toObjects(Medicine::class.java)
-            Result.success(medicines)
+            Log.d("FirebaseRepository", "Found ${medicines.size} active medicines")
+
+            Result.success(medicines.sortedByDescending { it.createdAt })
         } catch (e: Exception) {
+            Log.e("FirebaseRepository", "Error: ${e.message}", e)
             Result.failure(e)
         }
     }
@@ -222,7 +252,7 @@ class FirebaseRepository private constructor() {
     suspend fun deleteMedicine(medicineId: String): Result<Unit> {
         return try {
             medicinesCollection.document(medicineId)
-                .update("isActive", false)
+                .update("active", false)  // DEĞİŞTİ
                 .await()
             Result.success(Unit)
         } catch (e: Exception) {
@@ -238,7 +268,7 @@ class FirebaseRepository private constructor() {
             val snapshot = medicinesCollection
                 .whereEqualTo("barcode", barcode)
                 .whereEqualTo("userId", userId)
-                .whereEqualTo("isActive", true)
+                .whereEqualTo("active", true)  // DEĞİŞTİ
                 .limit(1)
                 .get()
                 .await()
@@ -259,8 +289,10 @@ class FirebaseRepository private constructor() {
             val docRef = alarmsCollection.document()
             val alarmWithId = alarm.copy(id = docRef.id)
             docRef.set(alarmWithId).await()
+            Log.d("FirebaseRepository", "Alarm added successfully: ${docRef.id}")
             Result.success(docRef.id)
         } catch (e: Exception) {
+            Log.e("FirebaseRepository", "Error adding alarm: ${e.message}", e)
             Result.failure(e)
         }
     }

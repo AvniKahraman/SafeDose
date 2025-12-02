@@ -1,4 +1,4 @@
-package com.avnikahraman.safedose.ui.auth.auth.Auth
+package com.avnikahraman.safedose.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,7 +11,6 @@ import com.avnikahraman.safedose.MainActivity
 import com.avnikahraman.safedose.R
 import com.avnikahraman.safedose.databinding.ActivityLoginBinding
 import com.avnikahraman.safedose.repository.FirebaseRepository
-import com.avnikahraman.safedose.ui.auth.auth.Auth.RegisterActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -145,19 +144,33 @@ class LoginActivity : AppCompatActivity() {
         binding.btnLogin.text = "Giriş yapılıyor..."
 
         lifecycleScope.launch {
-            val result = repository.signInWithEmail(email, password)
+            try {
+                val result = repository.signInWithEmail(email, password)
 
-            if (result.isSuccess) {
-                Toast.makeText(this@LoginActivity, "Giriş başarılı!", Toast.LENGTH_SHORT).show()
-                navigateToMainActivity()
-            } else {
-                // Hata göster
-                val error = result.exceptionOrNull()?.message ?: "Giriş başarısız"
-                Toast.makeText(this@LoginActivity, error, Toast.LENGTH_LONG).show()
+                runOnUiThread {
+                    if (result.isSuccess) {
+                        Toast.makeText(this@LoginActivity, "Giriş başarılı!", Toast.LENGTH_SHORT).show()
+                        navigateToMainActivity()
+                    } else {
+                        // Hata göster
+                        val error = result.exceptionOrNull()?.message ?: "Giriş başarısız"
+                        Toast.makeText(this@LoginActivity, error, Toast.LENGTH_LONG).show()
 
-                // Butonu tekrar aktif et
-                binding.btnLogin.isEnabled = true
-                binding.btnLogin.text = "Giriş Yap"
+                        // Butonu tekrar aktif et
+                        binding.btnLogin.isEnabled = true
+                        binding.btnLogin.text = "Giriş Yap"
+                    }
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(
+                        this@LoginActivity,
+                        "Hata: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    binding.btnLogin.isEnabled = true
+                    binding.btnLogin.text = "Giriş Yap"
+                }
             }
         }
     }
@@ -196,17 +209,31 @@ class LoginActivity : AppCompatActivity() {
         binding.btnGoogleSignIn.text = "Giriş yapılıyor..."
 
         lifecycleScope.launch {
-            val result = repository.signInWithGoogle(idToken)
+            try {
+                val result = repository.signInWithGoogle(idToken)
 
-            if (result.isSuccess) {
-                Toast.makeText(this@LoginActivity, "Google ile giriş başarılı!", Toast.LENGTH_SHORT).show()
-                navigateToMainActivity()
-            } else {
-                val error = result.exceptionOrNull()?.message ?: "Google girişi başarısız"
-                Toast.makeText(this@LoginActivity, error, Toast.LENGTH_LONG).show()
+                runOnUiThread {
+                    if (result.isSuccess) {
+                        Toast.makeText(this@LoginActivity, "Google ile giriş başarılı!", Toast.LENGTH_SHORT).show()
+                        navigateToMainActivity()
+                    } else {
+                        val error = result.exceptionOrNull()?.message ?: "Google girişi başarısız"
+                        Toast.makeText(this@LoginActivity, error, Toast.LENGTH_LONG).show()
 
-                binding.btnGoogleSignIn.isEnabled = true
-                binding.btnGoogleSignIn.text = "Google ile Giriş Yap"
+                        binding.btnGoogleSignIn.isEnabled = true
+                        binding.btnGoogleSignIn.text = "Google ile Giriş Yap"
+                    }
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(
+                        this@LoginActivity,
+                        "Hata: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    binding.btnGoogleSignIn.isEnabled = true
+                    binding.btnGoogleSignIn.text = "Google ile Giriş Yap"
+                }
             }
         }
     }

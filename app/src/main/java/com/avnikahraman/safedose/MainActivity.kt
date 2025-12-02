@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.avnikahraman.safedose.databinding.ActivityMainBinding
 import com.avnikahraman.safedose.repository.FirebaseRepository
-import com.avnikahraman.safedose.ui.auth.auth.Auth.LoginActivity
+import com.avnikahraman.safedose.ui.auth.LoginActivity
 import com.avnikahraman.safedose.ui.medicines.MedicinesActivity
 import com.avnikahraman.safedose.ui.auth.auth.Auth.scanner.ScannerActivity
 

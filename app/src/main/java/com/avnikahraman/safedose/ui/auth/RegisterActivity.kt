@@ -1,4 +1,4 @@
-package com.avnikahraman.safedose.ui.auth.auth.Auth
+package com.avnikahraman.safedose.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
@@ -172,23 +172,37 @@ class RegisterActivity : AppCompatActivity() {
         binding.btnRegister.text = "Kayıt yapılıyor..."
 
         lifecycleScope.launch {
-            val result = repository.signUpWithEmail(email, password, name)
+            try {
+                val result = repository.signUpWithEmail(email, password, name)
 
-            if (result.isSuccess) {
-                Toast.makeText(
-                    this@RegisterActivity,
-                    "Kayıt başarılı! Hoş geldiniz!",
-                    Toast.LENGTH_SHORT
-                ).show()
-                navigateToMainActivity()
-            } else {
-                // Hata göster
-                val error = result.exceptionOrNull()?.message ?: "Kayıt başarısız"
-                Toast.makeText(this@RegisterActivity, error, Toast.LENGTH_LONG).show()
+                runOnUiThread {
+                    if (result.isSuccess) {
+                        Toast.makeText(
+                            this@RegisterActivity,
+                            "Kayıt başarılı! Hoş geldiniz!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        navigateToMainActivity()
+                    } else {
+                        // Hata göster
+                        val error = result.exceptionOrNull()?.message ?: "Kayıt başarısız"
+                        Toast.makeText(this@RegisterActivity, error, Toast.LENGTH_LONG).show()
 
-                // Butonu tekrar aktif et
-                binding.btnRegister.isEnabled = true
-                binding.btnRegister.text = "Kayıt Ol"
+                        // Butonu tekrar aktif et
+                        binding.btnRegister.isEnabled = true
+                        binding.btnRegister.text = "Kayıt Ol"
+                    }
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(
+                        this@RegisterActivity,
+                        "Hata: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    binding.btnRegister.isEnabled = true
+                    binding.btnRegister.text = "Kayıt Ol"
+                }
             }
         }
     }
@@ -227,21 +241,35 @@ class RegisterActivity : AppCompatActivity() {
         binding.btnGoogleSignIn.text = "Kayıt yapılıyor..."
 
         lifecycleScope.launch {
-            val result = repository.signInWithGoogle(idToken)
+            try {
+                val result = repository.signInWithGoogle(idToken)
 
-            if (result.isSuccess) {
-                Toast.makeText(
-                    this@RegisterActivity,
-                    "Google ile kayıt başarılı!",
-                    Toast.LENGTH_SHORT
-                ).show()
-                navigateToMainActivity()
-            } else {
-                val error = result.exceptionOrNull()?.message ?: "Google kaydı başarısız"
-                Toast.makeText(this@RegisterActivity, error, Toast.LENGTH_LONG).show()
+                runOnUiThread {
+                    if (result.isSuccess) {
+                        Toast.makeText(
+                            this@RegisterActivity,
+                            "Google ile kayıt başarılı!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        navigateToMainActivity()
+                    } else {
+                        val error = result.exceptionOrNull()?.message ?: "Google kaydı başarısız"
+                        Toast.makeText(this@RegisterActivity, error, Toast.LENGTH_LONG).show()
 
-                binding.btnGoogleSignIn.isEnabled = true
-                binding.btnGoogleSignIn.text = "Google ile Kayıt Ol"
+                        binding.btnGoogleSignIn.isEnabled = true
+                        binding.btnGoogleSignIn.text = "Google ile Kayıt Ol"
+                    }
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(
+                        this@RegisterActivity,
+                        "Hata: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    binding.btnGoogleSignIn.isEnabled = true
+                    binding.btnGoogleSignIn.text = "Google ile Kayıt Ol"
+                }
             }
         }
     }

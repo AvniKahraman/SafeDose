@@ -3,6 +3,7 @@ package com.avnikahraman.safedose.ui.alarm
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -212,9 +213,14 @@ class AlarmSetupActivity : AppCompatActivity() {
         binding.btnSave.text = "Kaydediliyor..."
 
         val userId = repository.getCurrentUser()?.uid
+        Log.d("AlarmSetup", "Current UserId: $userId")
+
+
         if (userId == null) {
-            Toast.makeText(this, "Kullanıcı oturumu bulunamadı", Toast.LENGTH_SHORT).show()
-            finish()
+            runOnUiThread {
+                Toast.makeText(this, "Kullanıcı oturumu bulunamadı", Toast.LENGTH_SHORT).show()
+                finish()
+            }
             return
         }
 
@@ -225,26 +231,34 @@ class AlarmSetupActivity : AppCompatActivity() {
                 val startTime = String.format("%02d:%02d", selectedHour, selectedMinute)
 
                 val medicine = Medicine(
+                    id = "",
                     barcode = barcode,
                     name = name,
                     dosage = dosage,
+                    imageUrl = "",
                     description = description,
                     timesPerDay = timesPerDay,
                     startTime = startTime,
                     intervalHours = intervalHours,
                     durationDays = durationDays,
                     startDate = startDate,
-                    userId = userId
+                    userId = userId,
+                    createdAt = 0L,
+                    active = true  // DEĞİŞTİ
                 )
+                Log.d("AlarmSetup", "Medicine to save: $medicine")
 
                 // Firebase'e kaydet
                 val medicineResult = repository.addMedicine(medicine)
+                Log.d("AlarmSetup", "Save result: ${medicineResult.isSuccess}")
+                Log.d("AlarmSetup", "Medicine ID: ${medicineResult.getOrNull()}")
 
                 if (medicineResult.isFailure) {
+                    val error = medicineResult.exceptionOrNull()
                     runOnUiThread {
                         Toast.makeText(
                             this@AlarmSetupActivity,
-                            "İlaç kaydedilemedi: ${medicineResult.exceptionOrNull()?.message}",
+                            "İlaç kaydedilemedi: ${error?.message}",
                             Toast.LENGTH_LONG
                         ).show()
                         binding.btnSave.isEnabled = true
@@ -254,23 +268,48 @@ class AlarmSetupActivity : AppCompatActivity() {
                 }
 
                 val medicineId = medicineResult.getOrNull() ?: ""
+                if (medicineId.isEmpty()) {
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@AlarmSetupActivity,
+                            "İlaç kaydedilemedi: ID alınamadı",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        binding.btnSave.isEnabled = true
+                        binding.btnSave.text = "Kaydet"
+                    }
+                    return@launch
+                }
 
                 // Alarmları oluştur ve kaydet
                 val alarms = createAlarms(medicineId, name, timesPerDay, intervalHours, userId)
 
+                var alarmsSaved = 0
                 for (alarm in alarms) {
-                    repository.addAlarm(alarm)
-                    // Android AlarmManager'a da ekle
-                    AlarmScheduler.scheduleAlarm(this@AlarmSetupActivity, alarm)
+                    val alarmResult = repository.addAlarm(alarm)
+                    if (alarmResult.isSuccess) {
+                        // Android AlarmManager'a da ekle
+                        AlarmScheduler.scheduleAlarm(this@AlarmSetupActivity, alarm)
+                        alarmsSaved++
+                    }
                 }
 
                 runOnUiThread {
-                    Toast.makeText(
-                        this@AlarmSetupActivity,
-                        "İlaç ve alarmlar başarıyla kaydedildi!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    navigateToMain()
+                    if (alarmsSaved == alarms.size) {
+                        Toast.makeText(
+                            this@AlarmSetupActivity,
+                            "İlaç ve ${alarmsSaved} alarm başarıyla kaydedildi!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        navigateToMain()
+                    } else {
+                        Toast.makeText(
+                            this@AlarmSetupActivity,
+                            "İlaç kaydedildi ama bazı alarmlar kaydedilemedi",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        navigateToMain()
+                    }
                 }
 
             } catch (e: Exception) {

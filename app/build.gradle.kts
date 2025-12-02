@@ -82,6 +82,7 @@ dependencies {
 
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.androidx.activity)
 
     // Unit Test
     testImplementation("junit:junit:4.13.2")

@@ -200,20 +200,22 @@ class MedicineDetailActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                // İlacı sil (soft delete)
-                val deleteMedicineResult = repository.deleteMedicine(medicineId)
-
-                // İlaca ait alarmları sil
-                val deleteAlarmsResult = repository.deleteMedicineAlarms(medicineId)
-
-                // Android AlarmManager'dan da sil
+                // ÖNCE ALARMLARI AL (isActive=true olanlar)
                 val alarmsResult = repository.getMedicineAlarms(medicineId)
-                if (alarmsResult.isSuccess) {
-                    val alarms = alarmsResult.getOrNull() ?: emptyList()
-                    for (alarm in alarms) {
-                        AlarmScheduler.cancelAlarm(this@MedicineDetailActivity, alarm)
-                    }
+                val alarms = if (alarmsResult.isSuccess) {
+                    alarmsResult.getOrNull() ?: emptyList()
+                } else {
+                    emptyList()
                 }
+
+                // ALARMLARI ANDROID ALARMMANAGER'DAN SİL
+                for (alarm in alarms) {
+                    AlarmScheduler.cancelAlarm(this@MedicineDetailActivity, alarm)
+                }
+
+                // ŞİMDİ FIREBASE'DEN SİL (soft delete)
+                val deleteMedicineResult = repository.deleteMedicine(medicineId)
+                val deleteAlarmsResult = repository.deleteMedicineAlarms(medicineId)
 
                 runOnUiThread {
                     if (deleteMedicineResult.isSuccess && deleteAlarmsResult.isSuccess) {
@@ -222,6 +224,7 @@ class MedicineDetailActivity : AppCompatActivity() {
                             "İlaç başarıyla silindi",
                             Toast.LENGTH_SHORT
                         ).show()
+                        setResult(RESULT_OK)
                         finish()
                     } else {
                         Toast.makeText(

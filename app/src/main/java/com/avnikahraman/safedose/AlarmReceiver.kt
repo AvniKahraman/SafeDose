@@ -8,9 +8,11 @@ import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.avnikahraman.safedose.MainActivity
 import com.avnikahraman.safedose.R
+import com.avnikahraman.safedose.ui.alarm.AlarmActivity
 
 /**
  * Alarm tetiklendiğinde bildirim gösteren BroadcastReceiver
@@ -21,16 +23,30 @@ class AlarmReceiver : BroadcastReceiver() {
         private const val CHANNEL_ID = "medicine_alarm_channel"
         private const val CHANNEL_NAME = "İlaç Hatırlatmaları"
         private const val CHANNEL_DESCRIPTION = "İlaç alma zamanı bildirimleri"
+        private const val TAG = "AlarmReceiver"
+
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         val medicineName = intent.getStringExtra("medicine_name") ?: "İlaç"
         val time = intent.getStringExtra("time") ?: ""
         val alarmId = intent.getStringExtra("alarm_id") ?: ""
+        val snoozeCount = intent.getIntExtra("snooze_count", 0)
 
-        // Notification göster
-        showNotification(context, medicineName, time, alarmId)
+        Log.d(TAG, "Alarm received: $medicineName at $time (snooze: $snoozeCount)")
+
+        // Full screen alarm activity'yi başlat
+        val alarmIntent = Intent(context, AlarmActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra(AlarmActivity.EXTRA_MEDICINE_NAME, medicineName)
+            putExtra(AlarmActivity.EXTRA_TIME, time)
+            putExtra(AlarmActivity.EXTRA_ALARM_ID, alarmId)
+            putExtra(AlarmActivity.EXTRA_SNOOZE_COUNT, snoozeCount)
+        }
+        context.startActivity(alarmIntent)
     }
+
+
 
     /**
      * Bildirim göster
@@ -101,4 +117,6 @@ class AlarmReceiver : BroadcastReceiver() {
             notificationManager.createNotificationChannel(channel)
         }
     }
+
+
 }

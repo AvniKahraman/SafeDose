@@ -2,6 +2,7 @@ package com.avnikahraman.safedose.ui.medicines
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -91,6 +92,9 @@ class MedicinesActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             val result = repository.getUserMedicines(userId)
+            Log.d("MedicinesActivity", "Success: ${result.isSuccess}")
+            Log.d("MedicinesActivity", "Data: ${result.getOrNull()}")
+            Log.d("MedicinesActivity", "Error: ${result.exceptionOrNull()?.message}")
 
             runOnUiThread {
                 showLoading(false)

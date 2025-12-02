@@ -13,6 +13,9 @@
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -25,19 +28,13 @@
         android:theme="@style/Theme.SafeDose"
         tools:targetApi="31">
         <activity
-            android:name=".MedicineDetailActivity"
-            android:exported="false" />
+            android:name=".ui.alarm.AlarmActivity"
+            android:exported="false"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:excludeFromRecents="true" />
         <activity
-            android:name=".Medicines"
-            android:exported="false" />
-        <activity
-            android:name=".MedicineDetail"
-            android:exported="false" />
-        <activity
-            android:name=".Medicine"
-            android:exported="false" /> <!-- Login Activity - LAUNCHER -->
-        <activity
-            android:name=".ui.auth.auth.Auth.LoginActivity"
+            android:name=".ui.auth.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -46,8 +43,11 @@
             </intent-filter>
         </activity> <!-- Register Activity -->
         <activity
-            android:name=".ui.auth.auth.Auth.RegisterActivity"
-            android:exported="false" /> <!-- Main Activity -->
+            android:name=".ui.auth.RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.medicines.MedicineDetailActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="false" /> <!-- Scanner Activity -->
@@ -60,9 +60,6 @@
         <activity
             android:name=".ui.medicines.MedicinesActivity"
             android:exported="false" /> <!-- Medicine Detail Activity -->
-        <activity
-            android:name=".ui.medicines.MedicineDetailActivity"
-            android:exported="false" /> <!-- Alarm Receiver -->
         <receiver
             android:name=".utils.AlarmReceiver"
             android:enabled="true"

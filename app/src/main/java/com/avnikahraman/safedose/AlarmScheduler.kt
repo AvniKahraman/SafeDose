@@ -25,7 +25,10 @@ object AlarmScheduler {
             putExtra("alarm_id", alarm.id)
             putExtra("medicine_name", alarm.medicineName)
             putExtra("time", alarm.timeString)
+            putExtra("snooze_count", 0)  // İlk alarm, snooze count 0
         }
+
+
 
         val pendingIntent = PendingIntent.getBroadcast(
             context,
