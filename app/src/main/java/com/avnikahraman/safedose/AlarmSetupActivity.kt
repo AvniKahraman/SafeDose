@@ -13,7 +13,7 @@ import com.avnikahraman.safedose.models.Alarm
 import com.avnikahraman.safedose.models.Medicine
 import com.avnikahraman.safedose.repository.FirebaseRepository
 import com.avnikahraman.safedose.ui.auth.auth.Auth.scanner.ScannerActivity
-import com.avnikahraman.safedose.utils.AlarmScheduler
+import com.avnikahraman.safedose.AlarmScheduler
 import kotlinx.coroutines.launch
 import java.util.*
 

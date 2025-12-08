@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.avnikahraman.safedose.databinding.ActivityMedicineDetailBinding
 import com.avnikahraman.safedose.repository.FirebaseRepository
-import com.avnikahraman.safedose.utils.AlarmScheduler
+import com.avnikahraman.safedose.AlarmScheduler
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*

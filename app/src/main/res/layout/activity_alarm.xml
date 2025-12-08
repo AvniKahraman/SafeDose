@@ -73,7 +73,7 @@
             android:id="@+id/btnDismiss"
             android:layout_width="match_parent"
             android:layout_height="70dp"
-            android:text="KAPAT"
+            android:text="İlacımı İçtim"
             android:textSize="20sp"
             android:textStyle="bold"
             app:cornerRadius="16dp"
