@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.avnikahraman.safedose.MainActivity
@@ -19,17 +20,12 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import kotlinx.coroutines.launch
 
-/**
- * Kullanıcı kayıt ekranı
- * Email/Şifre ve Google ile kayıt destekler
- */
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
     private lateinit var repository: FirebaseRepository
     private lateinit var googleSignInClient: GoogleSignInClient
 
-    // Google Sign In için launcher
     private val googleSignInLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -40,22 +36,17 @@ class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // View Binding
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Repository instance
-        repository = FirebaseRepository.Companion.getInstance()
+        repository = FirebaseRepository.getInstance()
 
-        // Google Sign In yapılandırması
         setupGoogleSignIn()
 
-        // Toolbar setup
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "Kayıt Ol"
 
-        // Click listener'lar
         setupClickListeners()
     }
 
@@ -64,9 +55,6 @@ class RegisterActivity : AppCompatActivity() {
         return true
     }
 
-    /**
-     * Google Sign In yapılandırması
-     */
     private fun setupGoogleSignIn() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
@@ -76,11 +64,7 @@ class RegisterActivity : AppCompatActivity() {
         googleSignInClient = GoogleSignIn.getClient(this, gso)
     }
 
-    /**
-     * Click listener'ları ayarla
-     */
     private fun setupClickListeners() {
-        // Kayıt ol butonu
         binding.btnRegister.setOnClickListener {
             val name = binding.etName.text.toString().trim()
             val email = binding.etEmail.text.toString().trim()
@@ -92,20 +76,15 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        // Giriş yap text'i
         binding.tvLogin.setOnClickListener {
-            finish() // LoginActivity'ye geri dön
+            finish()
         }
 
-        // Google ile kayıt ol butonu
         binding.btnGoogleSignIn.setOnClickListener {
             signInWithGoogle()
         }
     }
 
-    /**
-     * Input validasyonu
-     */
     private fun validateInput(
         name: String,
         email: String,
@@ -163,11 +142,7 @@ class RegisterActivity : AppCompatActivity() {
         return true
     }
 
-    /**
-     * Email ve şifre ile kayıt ol
-     */
     private fun registerWithEmail(name: String, email: String, password: String) {
-        // Loading göster
         binding.btnRegister.isEnabled = false
         binding.btnRegister.text = "Kayıt yapılıyor..."
 
@@ -177,29 +152,17 @@ class RegisterActivity : AppCompatActivity() {
 
                 runOnUiThread {
                     if (result.isSuccess) {
-                        Toast.makeText(
-                            this@RegisterActivity,
-                            "Kayıt başarılı! Hoş geldiniz!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        navigateToMainActivity()
+                        sendEmailVerification()
                     } else {
-                        // Hata göster
                         val error = result.exceptionOrNull()?.message ?: "Kayıt başarısız"
                         Toast.makeText(this@RegisterActivity, error, Toast.LENGTH_LONG).show()
-
-                        // Butonu tekrar aktif et
                         binding.btnRegister.isEnabled = true
                         binding.btnRegister.text = "Kayıt Ol"
                     }
                 }
             } catch (e: Exception) {
                 runOnUiThread {
-                    Toast.makeText(
-                        this@RegisterActivity,
-                        "Hata: ${e.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(this@RegisterActivity, "Hata: ${e.message}", Toast.LENGTH_LONG).show()
                     binding.btnRegister.isEnabled = true
                     binding.btnRegister.text = "Kayıt Ol"
                 }
@@ -207,22 +170,46 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Google ile kayıt ol
-     */
+    private fun sendEmailVerification() {
+        val user = repository.getCurrentUser()
+
+        user?.sendEmailVerification()?.addOnCompleteListener { task ->
+            binding.btnRegister.isEnabled = true
+            binding.btnRegister.text = "Kayıt Ol"
+
+            if (task.isSuccessful) {
+                showEmailVerificationDialog()
+            } else {
+                Toast.makeText(
+                    this,
+                    "Email gönderilemedi: ${task.exception?.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
+    private fun showEmailVerificationDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Email Doğrulama")
+            .setMessage("Kayıt başarılı! Email adresinize doğrulama linki gönderildi. Lütfen email'inizi kontrol edin ve doğrulama linkine tıklayın.\n\nDoğruladıktan sonra giriş yapabilirsiniz.")
+            .setPositiveButton("Tamam") { _, _ ->
+                repository.signOut()
+                finish()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
     private fun signInWithGoogle() {
         val signInIntent = googleSignInClient.signInIntent
         googleSignInLauncher.launch(signInIntent)
     }
 
-    /**
-     * Google Sign In sonucunu işle
-     */
     private fun handleGoogleSignInResult(task: Task<GoogleSignInAccount>) {
         try {
             val account = task.getResult(ApiException::class.java)
 
-            // ID token al
             account?.idToken?.let { idToken ->
                 firebaseAuthWithGoogle(idToken)
             } ?: run {
@@ -233,9 +220,6 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Google ID token ile Firebase'e kayıt ol
-     */
     private fun firebaseAuthWithGoogle(idToken: String) {
         binding.btnGoogleSignIn.isEnabled = false
         binding.btnGoogleSignIn.text = "Kayıt yapılıyor..."
@@ -246,27 +230,18 @@ class RegisterActivity : AppCompatActivity() {
 
                 runOnUiThread {
                     if (result.isSuccess) {
-                        Toast.makeText(
-                            this@RegisterActivity,
-                            "Google ile kayıt başarılı!",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(this@RegisterActivity, "Google ile kayıt başarılı!", Toast.LENGTH_SHORT).show()
                         navigateToMainActivity()
                     } else {
                         val error = result.exceptionOrNull()?.message ?: "Google kaydı başarısız"
                         Toast.makeText(this@RegisterActivity, error, Toast.LENGTH_LONG).show()
-
                         binding.btnGoogleSignIn.isEnabled = true
                         binding.btnGoogleSignIn.text = "Google ile Kayıt Ol"
                     }
                 }
             } catch (e: Exception) {
                 runOnUiThread {
-                    Toast.makeText(
-                        this@RegisterActivity,
-                        "Hata: ${e.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(this@RegisterActivity, "Hata: ${e.message}", Toast.LENGTH_LONG).show()
                     binding.btnGoogleSignIn.isEnabled = true
                     binding.btnGoogleSignIn.text = "Google ile Kayıt Ol"
                 }
@@ -274,9 +249,6 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Ana ekrana git
-     */
     private fun navigateToMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

@@ -32,6 +32,17 @@ class AlarmSetupActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        barcode = intent.getStringExtra(ScannerActivity.EXTRA_BARCODE) ?: ""
+        val preFillName = intent.getStringExtra(ScannerActivity.EXTRA_MEDICINE_NAME) ?: ""
+        val imageUrl = intent.getStringExtra(ScannerActivity.EXTRA_MEDICINE_IMAGE) ?: ""
+        if (preFillName.isNotEmpty()) {
+            binding.etMedicineName.setText(preFillName)
+        }
+
+// Görseli göster (opsiyonel)
+        if (imageUrl.isNotEmpty()) {
+            // TODO: Glide ile resim yükle
+        }
 
         binding = ActivityAlarmSetupBinding.inflate(layoutInflater)
         setContentView(binding.root)

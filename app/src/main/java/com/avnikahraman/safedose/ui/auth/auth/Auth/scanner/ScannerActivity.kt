@@ -16,8 +16,10 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.avnikahraman.safedose.databinding.ActivityScannerBinding
+import com.avnikahraman.safedose.network.RetrofitClient
 import com.avnikahraman.safedose.repository.FirebaseRepository
 import com.avnikahraman.safedose.ui.alarm.AlarmSetupActivity
+import com.avnikahraman.safedose.BuildConfig  // ✅ BU SATIR OLMALI
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
@@ -35,13 +37,14 @@ class ScannerActivity : AppCompatActivity() {
     private lateinit var repository: FirebaseRepository
     private lateinit var cameraExecutor: ExecutorService
 
-    private var isScanning = true // Sürekli tarama yapmasın diye flag
+    private var isScanning = true
     private var lastScannedCode: String? = null // Son taranan kod
 
     companion object {
         private const val TAG = "ScannerActivity"
         const val EXTRA_BARCODE = "extra_barcode"
         const val EXTRA_MEDICINE_NAME = "extra_medicine_name"
+        const val EXTRA_MEDICINE_IMAGE = "extra_medicine_image"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -152,29 +155,74 @@ class ScannerActivity : AppCompatActivity() {
      * Barkod tarandığında
      */
     private fun onBarcodeScanned(barcode: String) {
-        // Taranan kodu göster
         binding.tvScannedCode.text = "Taranan Kod: $barcode"
 
-        // Ses çal (opsiyonel - basit beep)
-        // TODO: Beep sesi eklenebilir
-
-        // Popup göster: "Alarm kurmak ister misiniz?"
-        showAlarmSetupDialog(barcode)
+        // API'den ilaç bilgisi çek
+        fetchMedicineInfo(barcode)
     }
+    private fun fetchMedicineInfo(barcode: String) {
+        Log.d(TAG, "fetchMedicineInfo called for: $barcode")
+
+        lifecycleScope.launch {
+            try {
+                Log.d(TAG, "Making API request...")
+
+                val response = RetrofitClient.barcodeApi.lookupBarcode(
+                    barcode = barcode,
+                    apiKey = BuildConfig.BARCODE_API_KEY
+                )
+
+                Log.d(TAG, "API Response: ${response.isSuccessful}, Body: ${response.body()}")
+
+                if (response.isSuccessful && response.body() != null) {
+                    val products = response.body()?.products
+
+                    if (!products.isNullOrEmpty()) {
+                        val product = products[0]
+                        val medicineName = product.productName ?: product.title ?: "Bilinmeyen İlaç"
+                        val imageUrl = product.images?.firstOrNull() ?: ""
+
+                        runOnUiThread {
+                            showAlarmSetupDialog(barcode, medicineName, imageUrl)
+                        }
+                    } else {
+                        runOnUiThread {
+                            showAlarmSetupDialog(barcode, "", "")
+                        }
+                    }
+                } else {
+                    runOnUiThread {
+                        showAlarmSetupDialog(barcode, "", "")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "API Error: ${e.message}",e)
+                runOnUiThread {
+                    showAlarmSetupDialog(barcode, "", "")
+                }
+            }
+        }
+    }
+
+
+
 
     /**
      * Alarm kurma dialogu göster
      */
-    private fun showAlarmSetupDialog(barcode: String) {
+    private fun showAlarmSetupDialog(barcode: String, medicineName: String, imageUrl: String) {
         AlertDialog.Builder(this)
             .setTitle("İlaç Tarandı")
-            .setMessage("Bu ilaç için alarm kurmak ister misiniz?\n\nBarkod: $barcode")
+            .setMessage(
+                if (medicineName.isNotEmpty())
+                    "İlaç: $medicineName\n\nBarkod: $barcode\n\nAlarm kurmak ister misiniz?"
+                else
+                    "Barkod: $barcode\n\nAlarm kurmak ister misiniz?"
+            )
             .setPositiveButton("Evet") { _, _ ->
-                // AlarmSetupActivity'ye git
-                navigateToAlarmSetup(barcode)
+                navigateToAlarmSetup(barcode, medicineName, imageUrl)
             }
             .setNegativeButton("Hayır") { _, _ ->
-                // Sadece kapat ve taramaya devam et
                 resetScanning()
             }
             .setOnCancelListener {
@@ -186,8 +234,7 @@ class ScannerActivity : AppCompatActivity() {
     /**
      * Alarm kurma ekranına git
      */
-    private fun navigateToAlarmSetup(barcode: String) {
-        // Önce bu ilaç daha önce taranmış mı kontrol et
+    private fun navigateToAlarmSetup(barcode: String, medicineName: String, imageUrl: String) {
         lifecycleScope.launch {
             val userId = repository.getCurrentUser()?.uid ?: return@launch
             val result = repository.getMedicineByBarcode(barcode, userId)
@@ -195,7 +242,6 @@ class ScannerActivity : AppCompatActivity() {
             if (result.isSuccess) {
                 val existingMedicine = result.getOrNull()
                 if (existingMedicine != null) {
-                    // İlaç zaten var, kullanıcıya bildir
                     runOnUiThread {
                         showMedicineExistsDialog(existingMedicine.name)
                     }
@@ -203,9 +249,10 @@ class ScannerActivity : AppCompatActivity() {
                 }
             }
 
-            // İlaç yok, alarm kurma ekranına git
             val intent = Intent(this@ScannerActivity, AlarmSetupActivity::class.java).apply {
                 putExtra(EXTRA_BARCODE, barcode)
+                putExtra(EXTRA_MEDICINE_NAME, medicineName)
+                putExtra(EXTRA_MEDICINE_IMAGE, imageUrl)
             }
             startActivity(intent)
             finish()
