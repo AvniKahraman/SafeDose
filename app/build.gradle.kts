@@ -26,8 +26,9 @@ android {
         if (localPropertiesFile.exists()) {
             properties.load(FileInputStream(localPropertiesFile))
         }
-        val apiKey = properties.getProperty("BARCODE_API_KEY") ?: "test_key"
-        buildConfigField("String", "BARCODE_API_KEY", "\"$apiKey\"")
+
+        buildConfigField("String", "GOOGLE_API_KEY", "\"${properties.getProperty("GOOGLE_API_KEY") ?: ""}\"")
+        buildConfigField("String", "GOOGLE_SEARCH_ENGINE_ID", "\"${properties.getProperty("GOOGLE_SEARCH_ENGINE_ID") ?: ""}\"")
     }
 
     buildFeatures {

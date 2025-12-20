@@ -8,8 +8,6 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    private const val BASE_URL = "https://api.barcodelookup.com/"
-
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
@@ -20,11 +18,12 @@ object RetrofitClient {
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+    // Google Search API
+    private val googleRetrofit = Retrofit.Builder()
+        .baseUrl("https://www.googleapis.com/")
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    val barcodeApi: BarcodeApiService = retrofit.create(BarcodeApiService::class.java)
+    val googleSearchApi: GoogleSearchService = googleRetrofit.create(GoogleSearchService::class.java)
 }

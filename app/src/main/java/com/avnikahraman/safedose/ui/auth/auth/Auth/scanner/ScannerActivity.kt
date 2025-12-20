@@ -161,42 +161,48 @@ class ScannerActivity : AppCompatActivity() {
         fetchMedicineInfo(barcode)
     }
     private fun fetchMedicineInfo(barcode: String) {
-        Log.d(TAG, "fetchMedicineInfo called for: $barcode")
+        Log.d(TAG, "🔍 Searching Google for: $barcode")
 
         lifecycleScope.launch {
             try {
-                Log.d(TAG, "Making API request...")
+                val searchQuery = "$barcode ilaç"
 
-                val response = RetrofitClient.barcodeApi.lookupBarcode(
-                    barcode = barcode,
-                    apiKey = BuildConfig.BARCODE_API_KEY
+                val response = RetrofitClient.googleSearchApi.search(
+                    apiKey = BuildConfig.GOOGLE_API_KEY,
+                    searchEngineId = BuildConfig.GOOGLE_SEARCH_ENGINE_ID,
+                    query = searchQuery
                 )
 
-                Log.d(TAG, "API Response: ${response.isSuccessful}, Body: ${response.body()}")
+                Log.d(TAG, "📡 API Response Code: ${response.code()}")
 
                 if (response.isSuccessful && response.body() != null) {
-                    val products = response.body()?.products
+                    val items = response.body()?.items
 
-                    if (!products.isNullOrEmpty()) {
-                        val product = products[0]
-                        val medicineName = product.productName ?: product.title ?: "Bilinmeyen İlaç"
-                        val imageUrl = product.images?.firstOrNull() ?: ""
+                    if (!items.isNullOrEmpty()) {
+                        val firstResult = items[0]
+                        val medicineName = extractMedicineName(firstResult.title ?: "")
+                        val imageUrl = firstResult.pagemap?.images?.firstOrNull()?.src ?: ""
+
+                        Log.d(TAG, "✅ Found: $medicineName")
+                        Log.d(TAG, "🖼️ Image: $imageUrl")
 
                         runOnUiThread {
                             showAlarmSetupDialog(barcode, medicineName, imageUrl)
                         }
                     } else {
+                        Log.d(TAG, "❌ No results found")
                         runOnUiThread {
                             showAlarmSetupDialog(barcode, "", "")
                         }
                     }
                 } else {
+                    Log.e(TAG, "⚠️ API Error: ${response.code()}, ${response.errorBody()?.string()}")
                     runOnUiThread {
                         showAlarmSetupDialog(barcode, "", "")
                     }
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "API Error: ${e.message}",e)
+                Log.e(TAG, "💥 Error: ${e.message}", e)
                 runOnUiThread {
                     showAlarmSetupDialog(barcode, "", "")
                 }
@@ -204,6 +210,20 @@ class ScannerActivity : AppCompatActivity() {
         }
     }
 
+    private fun extractMedicineName(title: String): String {
+        // "Aspirin 500mg - İlaç Prospektüsü" -> "Aspirin 500mg"
+        return title
+            .substringBefore("-")
+            .substringBefore("|")
+            .substringBefore(":")
+            .substringBefore("Fiyatı")
+            .substringBefore("Nedir")
+            .trim()
+            .split(" ")
+            .take(2)
+            .joinToString(" ")
+            .ifEmpty { title.take(50) }
+    }
 
 
 

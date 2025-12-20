@@ -32,17 +32,6 @@ class AlarmSetupActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        barcode = intent.getStringExtra(ScannerActivity.EXTRA_BARCODE) ?: ""
-        val preFillName = intent.getStringExtra(ScannerActivity.EXTRA_MEDICINE_NAME) ?: ""
-        val imageUrl = intent.getStringExtra(ScannerActivity.EXTRA_MEDICINE_IMAGE) ?: ""
-        if (preFillName.isNotEmpty()) {
-            binding.etMedicineName.setText(preFillName)
-        }
-
-// Görseli göster (opsiyonel)
-        if (imageUrl.isNotEmpty()) {
-            // TODO: Glide ile resim yükle
-        }
 
         binding = ActivityAlarmSetupBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -52,6 +41,7 @@ class AlarmSetupActivity : AppCompatActivity() {
         // Intent'ten verileri al
         barcode = intent.getStringExtra(ScannerActivity.EXTRA_BARCODE) ?: ""
         medicineName = intent.getStringExtra(ScannerActivity.EXTRA_MEDICINE_NAME) ?: ""
+        val imageUrl = intent.getStringExtra(ScannerActivity.EXTRA_MEDICINE_IMAGE) ?: ""
 
         // Toolbar setup
         setSupportActionBar(binding.toolbar)
@@ -60,6 +50,18 @@ class AlarmSetupActivity : AppCompatActivity() {
 
         // Default değerler
         setDefaultValues()
+
+        // İLAÇ ADINI OTOMATIK DOLDUR
+        if (medicineName.isNotEmpty()) {
+            binding.etMedicineName.setText(medicineName)
+            binding.etMedicineName.setSelection(medicineName.length)  // Cursor'u sona al
+            Log.d("AlarmSetup", "✅ İlaç adı otomatik dolduruldu: $medicineName")
+        }
+
+        // BARKODU GÖSTER
+        if (barcode.isNotEmpty()) {
+            binding.tvBarcodeInfo.text = "Barkod: $barcode"
+        }
 
         // Click listeners
         setupClickListeners()
