@@ -27,13 +27,14 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- İlaç Görseli / Icon -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="💊"
-                android:textSize="80sp"
+            <!-- İlaç Görseli -->
+            <ImageView
+                android:id="@+id/ivMedicineImage"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:layout_gravity="center"
+                android:scaleType="centerCrop"
+                android:background="@android:color/darker_gray"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="24dp" />
 
@@ -48,6 +49,7 @@
                 android:textColor="@android:color/black"
                 android:gravity="center"
                 android:layout_marginBottom="8dp" />
+
 
             <!-- Dozaj -->
             <TextView

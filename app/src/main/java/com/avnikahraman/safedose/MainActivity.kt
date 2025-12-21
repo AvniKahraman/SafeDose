@@ -14,7 +14,10 @@ import com.avnikahraman.safedose.databinding.ActivityMainBinding
 import com.avnikahraman.safedose.repository.FirebaseRepository
 import com.avnikahraman.safedose.ui.auth.LoginActivity
 import com.avnikahraman.safedose.ui.medicines.MedicinesActivity
-import com.avnikahraman.safedose.ui.auth.auth.Auth.scanner.ScannerActivity
+
+import com.avnikahraman.safedose.ui.auth.scanner.ScannerActivity
+import com.avnikahraman.safedose.ui.reports.ReportsActivity
+import kotlin.jvm.java
 
 class MainActivity : AppCompatActivity() {
 
@@ -67,19 +70,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupClickListeners() {
+        // QR/Barkod Tarama
         binding.btnScanQR.setOnClickListener {
             checkCameraPermissionAndOpenScanner()
         }
 
+        // İlaçlarım
         binding.btnMyMedicines.setOnClickListener {
             val intent = Intent(this, MedicinesActivity::class.java)
             startActivity(intent)
         }
 
-        binding.btnAlarms.setOnClickListener {
-            Toast.makeText(this, "Alarmlar ekranı yakında eklenecek", Toast.LENGTH_SHORT).show()
+        // RAPORLAR
+        // Raporlar butonu
+        binding.btnReports.setOnClickListener {
+            val intent = Intent(this, ReportsActivity::class.java)
+            startActivity(intent)
         }
-
+        // Çıkış Yap
         binding.btnLogout.setOnClickListener {
             showLogoutDialog()
         }

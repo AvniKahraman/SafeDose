@@ -7,6 +7,8 @@ import com.avnikahraman.safedose.databinding.ItemMedicineBinding
 import com.avnikahraman.safedose.models.Medicine
 import java.text.SimpleDateFormat
 import java.util.*
+import com.bumptech.glide.Glide
+import com.avnikahraman.safedose.R
 
 /**
  * İlaç listesi için RecyclerView Adapter
@@ -54,6 +56,15 @@ class MedicineAdapter(
                 // İlaç adı ve dozaj
                 tvMedicineName.text = medicine.name
                 tvDosage.text = medicine.dosage
+                if (medicine.imageUrl.isNotEmpty()) {
+                    Glide.with(itemView.context)
+                        .load(medicine.imageUrl)
+                        .placeholder(R.drawable.ic_launcher_foreground)
+                        .error(R.drawable.ic_launcher_foreground)
+                        .into(ivMedicineImage)
+                } else {
+                    ivMedicineImage.setImageResource(R.drawable.ic_launcher_foreground)
+                }
 
                 // Kullanım bilgisi
                 val usageInfo = "Günde ${medicine.timesPerDay}x, ${medicine.intervalHours} saat aralıkla"

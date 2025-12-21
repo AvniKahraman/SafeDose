@@ -1,5 +1,6 @@
 package com.avnikahraman.safedose.ui.medicines
 
+import com.bumptech.glide.Glide
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -11,6 +12,8 @@ import com.avnikahraman.safedose.AlarmScheduler
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import com.avnikahraman.safedose.R
+
 
 /**
  * İlaç detay ekranı
@@ -93,6 +96,7 @@ class MedicineDetailActivity : AppCompatActivity() {
         startDate: Long
     ) {
         binding.apply {
+
             // İlaç bilgileri
             tvMedicineName.text = name
             tvDosage.text = dosage
@@ -104,6 +108,17 @@ class MedicineDetailActivity : AppCompatActivity() {
             tvStartTime.text = startTime
             tvIntervalHours.text = "$intervalHours saat"
             tvDurationDays.text = "$durationDays gün"
+
+            val imageUrl = intent.getStringExtra("EXTRA_MEDICINE_IMAGE") ?: ""
+            if (imageUrl.isNotEmpty()) {
+                Glide.with(this@MedicineDetailActivity)
+                    .load(imageUrl)
+                        .placeholder(R.drawable.ic_launcher_foreground)
+                    .error(R.drawable.ic_launcher_foreground)
+                    .into(ivMedicineImage)
+            } else {
+                ivMedicineImage.setImageResource(R.drawable.ic_launcher_foreground)
+            }
 
             // Tarih bilgileri
             val startDateStr = dateFormat.format(Date(startDate))

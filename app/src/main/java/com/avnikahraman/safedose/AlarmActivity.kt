@@ -13,6 +13,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import com.avnikahraman.safedose.MainActivity
 import com.avnikahraman.safedose.databinding.ActivityAlarmBinding
 import com.avnikahraman.safedose.utils.AlarmReceiver
 
@@ -70,8 +71,9 @@ class AlarmActivity : AppCompatActivity() {
         // Kapat butonu
         binding.btnDismiss.setOnClickListener {
             stopAlarm()
-            finish()
+            navigateToMain()  // BUNU EKLE
         }
+
 
         // Ertele butonu
         binding.btnSnooze.setOnClickListener {
@@ -81,6 +83,14 @@ class AlarmActivity : AppCompatActivity() {
                 finish()
             }
         }
+    }
+    private fun navigateToMain() {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or
+                    Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        startActivity(intent)
+        finish()
     }
 
     private fun updateSnoozeButton() {
@@ -165,6 +175,7 @@ class AlarmActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        // Geri tuşunu devre dışı bırak
+        // bilinçli olarak boş
     }
+
 }

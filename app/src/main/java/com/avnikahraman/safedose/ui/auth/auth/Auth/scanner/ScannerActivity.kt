@@ -1,4 +1,4 @@
-package com.avnikahraman.safedose.ui.auth.auth.Auth.scanner
+package com.avnikahraman.safedose.ui.auth.scanner
 
 import android.content.Intent
 import android.os.Bundle

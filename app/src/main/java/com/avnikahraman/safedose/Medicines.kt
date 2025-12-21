@@ -156,6 +156,7 @@ class MedicinesActivity : AppCompatActivity() {
             putExtra(MedicineDetailActivity.EXTRA_MEDICINE_INTERVAL_HOURS, medicine.intervalHours)
             putExtra(MedicineDetailActivity.EXTRA_MEDICINE_DURATION_DAYS, medicine.durationDays)
             putExtra(MedicineDetailActivity.EXTRA_MEDICINE_START_DATE, medicine.startDate)
+            putExtra("EXTRA_MEDICINE_IMAGE", medicine.imageUrl)  // BUNU EKLE
         }
         startActivity(intent)
     }
