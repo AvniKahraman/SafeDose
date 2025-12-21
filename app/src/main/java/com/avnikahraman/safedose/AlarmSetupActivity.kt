@@ -29,6 +29,8 @@ class AlarmSetupActivity : AppCompatActivity() {
     private var selectedMinute: Int = 0
     private var barcode: String = ""
     private var medicineName: String = ""
+    private var imageUrl: String = ""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +43,7 @@ class AlarmSetupActivity : AppCompatActivity() {
         // Intent'ten verileri al
         barcode = intent.getStringExtra(ScannerActivity.EXTRA_BARCODE) ?: ""
         medicineName = intent.getStringExtra(ScannerActivity.EXTRA_MEDICINE_NAME) ?: ""
-        val imageUrl = intent.getStringExtra(ScannerActivity.EXTRA_MEDICINE_IMAGE) ?: ""
+        imageUrl = intent.getStringExtra(ScannerActivity.EXTRA_MEDICINE_IMAGE) ?: ""
 
         // Toolbar setup
         setSupportActionBar(binding.toolbar)
@@ -248,7 +250,7 @@ class AlarmSetupActivity : AppCompatActivity() {
                     barcode = barcode,
                     name = name,
                     dosage = dosage,
-                    imageUrl = "",
+                    imageUrl = imageUrl,
                     description = description,
                     timesPerDay = timesPerDay,
                     startTime = startTime,

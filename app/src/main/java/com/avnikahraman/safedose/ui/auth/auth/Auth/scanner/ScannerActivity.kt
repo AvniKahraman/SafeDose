@@ -161,54 +161,66 @@ class ScannerActivity : AppCompatActivity() {
         fetchMedicineInfo(barcode)
     }
     private fun fetchMedicineInfo(barcode: String) {
-        Log.d(TAG, "🔍 Searching Google for: $barcode")
-
         lifecycleScope.launch {
             try {
-                val searchQuery = "$barcode ilaç"
-
-                val response = RetrofitClient.googleSearchApi.search(
+                // 1️⃣ METİN ARAMASI (İLACABAK vs – İSİM İÇİN)
+                val textResponse = RetrofitClient.googleSearchApi.search(
                     apiKey = BuildConfig.GOOGLE_API_KEY,
                     searchEngineId = BuildConfig.GOOGLE_SEARCH_ENGINE_ID,
-                    query = searchQuery
+                    query = "$barcode ilaç"
                 )
 
-                Log.d(TAG, "📡 API Response Code: ${response.code()}")
+                val firstTextItem = textResponse.body()
+                    ?.items
+                    ?.firstOrNull()
 
-                if (response.isSuccessful && response.body() != null) {
-                    val items = response.body()?.items
+                val medicineName = extractMedicineName(firstTextItem?.title ?: "")
 
-                    if (!items.isNullOrEmpty()) {
-                        val firstResult = items[0]
-                        val medicineName = extractMedicineName(firstResult.title ?: "")
-                        val imageUrl = firstResult.pagemap?.images?.firstOrNull()?.src ?: ""
+                // 2️⃣ GÖRSEL ARAMASI (SADECE IMAGE SEARCH)
+                val imageResponse = RetrofitClient.googleSearchApi.searchImage(
+                    apiKey = BuildConfig.GOOGLE_API_KEY,
+                    searchEngineId = BuildConfig.GOOGLE_SEARCH_ENGINE_ID,
+                    query = "$medicineName ilaç kutusu  ambalaj -reklam -stock -site:ilacabak.com -site:ilacrehberi.com "
+                )
 
-                        Log.d(TAG, "✅ Found: $medicineName")
-                        Log.d(TAG, "🖼️ Image: $imageUrl")
+                val imageUrl = pickValidImage(imageResponse.body()?.items)
 
-                        runOnUiThread {
-                            showAlarmSetupDialog(barcode, medicineName, imageUrl)
-                        }
-                    } else {
-                        Log.d(TAG, "❌ No results found")
-                        runOnUiThread {
-                            showAlarmSetupDialog(barcode, "", "")
-                        }
-                    }
-                } else {
-                    Log.e(TAG, "⚠️ API Error: ${response.code()}, ${response.errorBody()?.string()}")
-                    runOnUiThread {
-                        showAlarmSetupDialog(barcode, "", "")
-                    }
+
+                runOnUiThread {
+                    showAlarmSetupDialog(barcode, medicineName, imageUrl)
                 }
+
             } catch (e: Exception) {
-                Log.e(TAG, "💥 Error: ${e.message}", e)
                 runOnUiThread {
                     showAlarmSetupDialog(barcode, "", "")
                 }
             }
         }
     }
+    private fun pickValidImage(items: List<com.avnikahraman.safedose.models.GoogleSearchItem>?): String {
+        if (items.isNullOrEmpty()) return ""
+
+        for (item in items) {
+            val link = item.link ?: continue
+            if (blockedImageDomains.none { link.contains(it, ignoreCase = true) }) {
+                return link
+            }
+        }
+        return ""
+    }
+
+    private val blockedImageDomains = listOf(
+        "googleusercontent.com",
+        "gstatic.com",
+        "ads",
+        "reklam",
+        "stock",
+        "shutterstock",
+        "istock",
+        "alamy",
+        "depositphotos"
+    )
+
 
     private fun extractMedicineName(title: String): String {
         // "Aspirin 500mg - İlaç Prospektüsü" -> "Aspirin 500mg"

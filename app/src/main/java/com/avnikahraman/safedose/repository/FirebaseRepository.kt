@@ -9,6 +9,8 @@ import com.avnikahraman.safedose.models.Alarm
 import com.avnikahraman.safedose.models.Medicine
 import com.avnikahraman.safedose.models.User
 import kotlinx.coroutines.tasks.await
+import com.avnikahraman.safedose.network.RetrofitClient
+
 
 class FirebaseRepository private constructor() {
 
@@ -112,6 +114,42 @@ class FirebaseRepository private constructor() {
             } ?: Result.failure(Exception("Google girişi başarısız"))
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+    suspend fun fetchMedicineNameAndImage(query: String): Pair<String?, String?> {
+        return try {
+            val apiKey = "GOOGLE_API_KEY"
+            val cx = "CUSTOM_SEARCH_ENGINE_ID"
+
+            // İLAÇ ADI (text search)
+            val textResponse = RetrofitClient.googleSearchApi.search(
+                apiKey = apiKey,
+                searchEngineId = cx,
+                query = query
+            )
+
+            val medicineName = textResponse.body()
+                ?.items
+                ?.firstOrNull()
+                ?.title
+
+            // GÖRSEL (image search)
+            val imageResponse = RetrofitClient.googleSearchApi.searchImage(
+                apiKey = apiKey,
+                searchEngineId = cx,
+                query = "$query ilaç"
+            )
+
+            val imageUrl = imageResponse.body()
+                ?.items
+                ?.firstOrNull()
+                ?.link
+
+            Pair(medicineName, imageUrl)
+
+        } catch (e: Exception) {
+            Log.e("FirebaseRepository", "Google search error: ${e.message}")
+            Pair(null, null)
         }
     }
 
