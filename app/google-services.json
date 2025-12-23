@@ -7,12 +7,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:322341595978:android:283a1b077e7c4d8dbdefb3",
+        "mobilesdk_app_id": "1:322341595978:android:d4331aaa19decbd9bdefb3",
         "android_client_info": {
           "package_name": "com.avnikahraman.safedose"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "322341595978-05jkq7699i0lrhv5m177doqgvl3553jf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.avnikahraman.safedose",
+            "certificate_hash": "11b6ad3cc60ed3463c2dfb09c1436c50ac0f1e76"
+          }
+        },
         {
           "client_id": "322341595978-33iv1ud7muht2p4rg194fmk9f2bi2v56.apps.googleusercontent.com",
           "client_type": 3
