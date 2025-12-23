@@ -57,6 +57,7 @@ android {
 }
 
 dependencies {
+    implementation("com.itextpdf:itext7-core:7.2.5")
     implementation ("com.github.bumptech.glide:glide:4.16.0")
     implementation(libs.androidx.activity)
     annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")

@@ -1,19 +1,8 @@
 <resources>
     <string name="app_name">SafeDose</string>
 
-    <!--
-        Google Sign In için Web Client ID
-        Bu ID'yi Firebase Console'dan alman gerekiyor:
-        1. Firebase Console > Project Settings
-        2. General sekmesi
-        3. Your apps bölümünde Web app'i bul
-        4. Web client ID'yi kopyala
-        5. Aşağıya yapıştır
 
-        ÖRNEK:
-        <string name="default_web_client_id">123456789-abcdefg.apps.googleusercontent.com</string>
-    -->
-    <string name="default_web_client_id">YOUR_WEB_CLIENT_ID_HERE</string>
+    <string name="default_web_client_id">322341595978-33iv1ud7muht2p4rg194fmk9f2bi2v56.apps.googleusercontent.com</string>
 
     <!-- Login & Register Strings -->
     <string name="login_title">Giriş Yap</string>
