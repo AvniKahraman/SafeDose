@@ -20,8 +20,6 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
-
-
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -31,11 +29,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SafeDose"
         tools:targetApi="31">
+
+        <activity
+            android:name=".ui.main.DeveloperInfoActivity"
+            android:label="Hakkında"
+            android:parentActivityName=".MainActivity">
+            <!-- Up (geri) butonu için -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <!-- Reports Activity -->
         <activity
             android:name=".ui.reports.ReportsActivity"
             android:exported="false" />
-
 
         <provider
             android:name="androidx.core.content.FileProvider"

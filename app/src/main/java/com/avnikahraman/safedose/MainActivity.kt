@@ -14,8 +14,9 @@ import com.avnikahraman.safedose.databinding.ActivityMainBinding
 import com.avnikahraman.safedose.repository.FirebaseRepository
 import com.avnikahraman.safedose.ui.auth.LoginActivity
 import com.avnikahraman.safedose.ui.medicines.MedicinesActivity
-
+import com.google.android.material.snackbar.Snackbar
 import com.avnikahraman.safedose.ui.auth.scanner.ScannerActivity
+import com.avnikahraman.safedose.ui.main.DeveloperInfoActivity
 import com.avnikahraman.safedose.ui.reports.ReportsActivity
 import kotlin.jvm.java
 
@@ -61,8 +62,12 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.title = "SafeDose"
+        binding.btnDeveloperInfo.setOnClickListener {
+            val intent = Intent(this, DeveloperInfoActivity::class.java)
+            startActivity(intent)
+        }
+
+
 
         checkNotificationPermission()
         setupClickListeners()
@@ -100,6 +105,7 @@ class MainActivity : AppCompatActivity() {
             binding.tvWelcome.text = "Merhaba, $displayName!"
         }
     }
+
 
     private fun checkCameraPermissionAndOpenScanner() {
         when {
