@@ -58,17 +58,32 @@
                 android:id="@+id/btnDeveloperInfo"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:padding="0dp"
                 android:text="ℹ️"
                 android:textSize="14sp"
-                android:padding="0dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                app:cornerRadius="16dp"
                 app:backgroundTint="@android:color/darker_gray"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:cornerRadius="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Büyük QR/Barkod Tarama Butonu -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnUserManual"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="8dp"
+                android:padding="0dp"
+                android:text="📝"
+                android:textSize="14sp"
+                app:backgroundTint="@android:color/holo_blue_dark"
+                app:cornerRadius="16dp"
+                app:layout_constraintEnd_toEndOf="@id/btnDeveloperInfo"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@id/btnDeveloperInfo"
+                app:layout_constraintTop_toBottomOf="@id/btnDeveloperInfo" />
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardScanButton"
                 android:layout_width="0dp"

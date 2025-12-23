@@ -1,8 +1,10 @@
 package com.avnikahraman.safedose
 
 import android.Manifest
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -10,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import com.avnikahraman.safedose.databinding.ActivityMainBinding
 import com.avnikahraman.safedose.repository.FirebaseRepository
 import com.avnikahraman.safedose.ui.auth.LoginActivity
@@ -18,6 +21,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.avnikahraman.safedose.ui.auth.scanner.ScannerActivity
 import com.avnikahraman.safedose.ui.main.DeveloperInfoActivity
 import com.avnikahraman.safedose.ui.reports.ReportsActivity
+import java.io.File
+import java.io.FileOutputStream
 import kotlin.jvm.java
 
 class MainActivity : AppCompatActivity() {
@@ -55,6 +60,32 @@ class MainActivity : AppCompatActivity() {
             navigateToLogin()
             return
         }
+        binding.btnUserManual.setOnClickListener {
+            val pdfFile = File(filesDir, "manuel.pdf")
+            if (!pdfFile.exists()) {
+                Toast.makeText(this, "Manuel PDF bulunamadı", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val pdfUri = FileProvider.getUriForFile(
+                this,
+                "${packageName}.provider", // DİKKAT: Burada fileprovider yerine .provider yazıyoruz
+                pdfFile
+            )
+
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(pdfUri, "application/pdf")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+
+            try {
+                startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                Toast.makeText(this, "PDF açacak uygulama bulunamadı", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
 
         val user = repository.getCurrentUser()
         if (user?.isEmailVerified == false) {
@@ -68,11 +99,22 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
+        copyManualPdfIfNotExists()
         checkNotificationPermission()
         setupClickListeners()
         displayUserInfo()
     }
+    private fun copyManualPdfIfNotExists() {
+        val pdfFile = File(filesDir, "manuel.pdf")
+        if (!pdfFile.exists()) {
+            assets.open("manuel.pdf").use { input ->
+                FileOutputStream(pdfFile).use { output ->
+                    input.copyTo(output)
+                }
+            }
+        }
+    }
+
 
     private fun setupClickListeners() {
         // QR/Barkod Tarama
