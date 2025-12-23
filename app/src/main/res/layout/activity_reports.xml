@@ -12,14 +12,16 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:background="#F5F5F5">
 
         <TextView
             android:id="@+id/tvReportContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:background="#F5F5F5"/>
     </ScrollView>
 
     <LinearLayout
