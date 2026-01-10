@@ -16,6 +16,7 @@ import androidx.core.content.FileProvider
 import com.avnikahraman.safedose.databinding.ActivityMainBinding
 import com.avnikahraman.safedose.repository.FirebaseRepository
 import com.avnikahraman.safedose.ui.auth.LoginActivity
+import com.avnikahraman.safedose.ui.auth.manual.UserManualActivity
 import com.avnikahraman.safedose.ui.medicines.MedicinesActivity
 import com.google.android.material.snackbar.Snackbar
 import com.avnikahraman.safedose.ui.auth.scanner.ScannerActivity
@@ -61,29 +62,11 @@ class MainActivity : AppCompatActivity() {
             return
         }
         binding.btnUserManual.setOnClickListener {
-            val pdfFile = File(filesDir, "manuel.pdf")
-            if (!pdfFile.exists()) {
-                Toast.makeText(this, "Manuel PDF bulunamadı", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val pdfUri = FileProvider.getUriForFile(
-                this,
-                "${packageName}.provider", // DİKKAT: Burada fileprovider yerine .provider yazıyoruz
-                pdfFile
+            startActivity(
+                Intent(this, UserManualActivity::class.java)
             )
-
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(pdfUri, "application/pdf")
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-
-            try {
-                startActivity(intent)
-            } catch (e: ActivityNotFoundException) {
-                Toast.makeText(this, "PDF açacak uygulama bulunamadı", Toast.LENGTH_SHORT).show()
-            }
         }
+
 
 
 

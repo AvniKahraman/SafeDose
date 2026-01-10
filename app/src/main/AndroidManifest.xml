@@ -29,17 +29,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SafeDose"
         tools:targetApi="31">
+        <activity
+            android:name=".ui.auth.manual.UserManualActivity"
+            android:exported="false" />
 
         <activity
             android:name=".ui.main.DeveloperInfoActivity"
             android:label="Hakkında"
             android:parentActivityName=".MainActivity">
+
             <!-- Up (geri) butonu için -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
-        </activity>
-        <!-- Reports Activity -->
+        </activity> <!-- Reports Activity -->
         <activity
             android:name=".ui.reports.ReportsActivity"
             android:exported="false" />
@@ -53,10 +56,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
-
-
-
 
         <receiver
             android:name=".BootReceiver"
