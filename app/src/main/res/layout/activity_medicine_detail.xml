@@ -1,399 +1,337 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <!-- Toolbar -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fillViewport="true">
+        <!-- Toolbar -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-        <LinearLayout
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="#F5F5F5">
+
+                <!-- İlaç Görseli -->
+                <ImageView
+                    android:id="@+id/ivMedicineImage"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_gravity="center"
+                    android:scaleType="centerCrop"
+                    android:background="@android:color/darker_gray"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- İlaç Adı -->
+                <TextView
+                    android:id="@+id/tvMedicineName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Aspirin"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black"
+                    android:gravity="center"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Dozaj -->
+                <TextView
+                    android:id="@+id/tvDosage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="500mg"
+                    android:textSize="22sp"
+                    android:textColor="@android:color/holo_blue_dark"
+                    android:gravity="center"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:color/darker_gray"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Açıklama -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Açıklama"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tvDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Baş ağrısı için kullanılır"
+                    android:textSize="18sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Barkod -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Barkod"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tvBarcode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="8699546789012"
+                    android:textSize="18sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Kullanım Bilgileri Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@android:color/holo_blue_light">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="📋 Kullanım Bilgileri"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:textColor="@android:color/white"
+                            android:layout_marginBottom="16dp" />
+
+                        <!-- Günde Kaç Defa -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Günde:"
+                                android:textSize="18sp"
+                                android:textColor="@android:color/white" />
+
+                            <TextView
+                                android:id="@+id/tvTimesPerDay"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="2 defa"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="@android:color/white" />
+                        </LinearLayout>
+
+                        <!-- İlk Doz -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="İlk Doz:"
+                                android:textSize="18sp"
+                                android:textColor="@android:color/white" />
+
+                            <TextView
+                                android:id="@+id/tvStartTime"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="08:00"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="@android:color/white" />
+                        </LinearLayout>
+
+                        <!-- Aralık Saatleri -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Aralık:"
+                                android:textSize="18sp"
+                                android:textColor="@android:color/white" />
+
+                            <TextView
+                                android:id="@+id/tvIntervalHours"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="8 saat"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="@android:color/white" />
+                        </LinearLayout>
+
+                        <!-- Süre -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Süre:"
+                                android:textSize="18sp"
+                                android:textColor="@android:color/white" />
+
+                            <TextView
+                                android:id="@+id/tvDurationDays"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="7 gün"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="@android:color/white" />
+                        </LinearLayout>
+
+                        <!-- Başlangıç Tarihi -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Başlangıç:"
+                                android:textSize="18sp"
+                                android:textColor="@android:color/white" />
+
+                            <TextView
+                                android:id="@+id/tvStartDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="01 Ocak 2026"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="@android:color/white" />
+                        </LinearLayout>
+
+                        <!-- Bitiş Tarihi -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Bitiş:"
+                                android:textSize="18sp"
+                                android:textColor="@android:color/white" />
+
+                            <TextView
+                                android:id="@+id/tvEndDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="08 Ocak 2026"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="@android:color/white" />
+                        </LinearLayout>
+
+                        <!-- Kalan Gün -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Kalan Gün:"
+                                android:textSize="18sp"
+                                android:textColor="@android:color/white" />
+
+                            <TextView
+                                android:id="@+id/tvDaysRemaining"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="7 gün"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="@android:color/white" />
+                        </LinearLayout>
+
+                        <!-- Alarm Saatleri -->
+                        <TextView
+                            android:id="@+id/tvAlarmTimes"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="🔔 08:00\n🔔 16:00"
+                            android:textSize="18sp"
+                            android:textColor="@android:color/white"
+                            android:layout_marginTop="8dp" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- Sil Butonu -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDelete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:background="#F5F5F5">
+            android:text="İlacı Sil"
+            android:textSize="20sp"
+            android:textColor="@android:color/white"
+            android:layout_margin="16dp"
+            app:cornerRadius="8dp"
+            app:backgroundTint="@android:color/holo_red_dark" />
 
-            <!-- İlaç Görseli -->
-            <ImageView
-                android:id="@+id/ivMedicineImage"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_gravity="center"
-                android:scaleType="centerCrop"
-                android:background="@android:color/darker_gray"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="24dp" />
-
-            <!-- İlaç Adı -->
-            <TextView
-                android:id="@+id/tvMedicineName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Aspirin"
-                android:textSize="28sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black"
-                android:gravity="center"
-                android:layout_marginBottom="8dp" />
-
-
-            <!-- Dozaj -->
-            <TextView
-                android:id="@+id/tvDosage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="500mg"
-                android:textSize="18sp"
-                android:textColor="@android:color/holo_blue_dark"
-                android:gravity="center"
-                android:layout_marginBottom="24dp" />
-
-            <!-- Divider -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@android:color/darker_gray"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Açıklama -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Açıklama"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/tvDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Baş ağrısı için kullanılır"
-                android:textSize="14sp"
-                android:textColor="@android:color/darker_gray"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Barkod -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Barkod"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/tvBarcode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="8699546789012"
-                android:textSize="14sp"
-                android:textColor="@android:color/darker_gray"
-                android:layout_marginBottom="24dp" />
-
-            <!-- Kullanım Bilgileri Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/holo_blue_light">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="📋 Kullanım Bilgileri"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@android:color/white"
-                        android:layout_marginBottom="16dp" />
-
-                    <!-- Günde Kaç Defa -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Günde:"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/white" />
-
-                        <TextView
-                            android:id="@+id/tvTimesPerDay"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="2 defa"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/white" />
-
-                    </LinearLayout>
-
-                    <!-- İlk Doz Saati -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="İlk Doz:"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/white" />
-
-                        <TextView
-                            android:id="@+id/tvStartTime"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="08:00"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/white" />
-
-                    </LinearLayout>
-
-                    <!-- Aralık -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Aralık:"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/white" />
-
-                        <TextView
-                            android:id="@+id/tvIntervalHours"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="12 saat"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/white" />
-
-                    </LinearLayout>
-
-                    <!-- Kullanım Süresi -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Süre:"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/white" />
-
-                        <TextView
-                            android:id="@+id/tvDurationDays"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="7 gün"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/white" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Tarih Bilgileri Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/holo_green_light">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="📅 Tarih Bilgileri"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@android:color/white"
-                        android:layout_marginBottom="16dp" />
-
-                    <!-- Başlangıç -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Başlangıç:"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/white" />
-
-                        <TextView
-                            android:id="@+id/tvStartDate"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="01 Ocak 2025"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/white" />
-
-                    </LinearLayout>
-
-                    <!-- Bitiş -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Bitiş:"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/white" />
-
-                        <TextView
-                            android:id="@+id/tvEndDate"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="08 Ocak 2025"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/white" />
-
-                    </LinearLayout>
-
-                    <!-- Kalan Gün -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Durum:"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/white" />
-
-                        <TextView
-                            android:id="@+id/tvDaysRemaining"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="7 gün kaldı"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/white" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Alarm Saatleri Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/holo_orange_light">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="⏰ Alarm Saatleri"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@android:color/white"
-                        android:layout_marginBottom="12dp" />
-
-                    <TextView
-                        android:id="@+id/tvAlarmTimes"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="🔔 08:00\n🔔 20:00"
-                        android:textSize="14sp"
-                        android:textColor="@android:color/white"
-                        android:lineSpacingExtra="4dp" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-        </LinearLayout>
-
-    </ScrollView>
-
-    <!-- Sil Butonu -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnDelete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="İlacı Sil"
-        android:textColor="@android:color/white"
-        android:layout_margin="16dp"
-        app:cornerRadius="8dp"
-        app:backgroundTint="@android:color/holo_red_dark" />
-
-</LinearLayout>
+    </LinearLayout>
