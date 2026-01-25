@@ -33,12 +33,12 @@ class MedicineDetailActivity : AppCompatActivity() {
         const val EXTRA_MEDICINE_DOSAGE = "medicine_dosage"
         const val EXTRA_MEDICINE_DESCRIPTION = "medicine_description"
         const val EXTRA_MEDICINE_BARCODE = "medicine_barcode"
-        const val EXTRA_MEDICINE_TIMES_PER_DAY = "medicine_times_per_day"
         const val EXTRA_MEDICINE_START_TIME = "medicine_start_time"
         const val EXTRA_MEDICINE_INTERVAL_HOURS = "medicine_interval_hours"
         const val EXTRA_MEDICINE_DURATION_DAYS = "medicine_duration_days"
         const val EXTRA_MEDICINE_START_DATE = "medicine_start_date"
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,9 +54,8 @@ class MedicineDetailActivity : AppCompatActivity() {
         val dosage = intent.getStringExtra(EXTRA_MEDICINE_DOSAGE) ?: ""
         val description = intent.getStringExtra(EXTRA_MEDICINE_DESCRIPTION) ?: ""
         val barcode = intent.getStringExtra(EXTRA_MEDICINE_BARCODE) ?: ""
-        val timesPerDay = intent.getIntExtra(EXTRA_MEDICINE_TIMES_PER_DAY, 0)
+        val timesPerDay = intent.getIntExtra(EXTRA_MEDICINE_INTERVAL_HOURS, 0)
         val startTime = intent.getStringExtra(EXTRA_MEDICINE_START_TIME) ?: ""
-        val intervalHours = intent.getIntExtra(EXTRA_MEDICINE_INTERVAL_HOURS, 0)
         val durationDays = intent.getIntExtra(EXTRA_MEDICINE_DURATION_DAYS, 0)
         val startDate = intent.getLongExtra(EXTRA_MEDICINE_START_DATE, 0L)
 
@@ -68,9 +67,10 @@ class MedicineDetailActivity : AppCompatActivity() {
         // Verileri göster
         displayMedicineInfo(
             name, dosage, description, barcode,
-            timesPerDay, startTime, intervalHours,
+            timesPerDay, startTime,
             durationDays, startDate
         )
+
 
         // Click listeners
         setupClickListeners()
@@ -91,10 +91,10 @@ class MedicineDetailActivity : AppCompatActivity() {
         barcode: String,
         timesPerDay: Int,
         startTime: String,
-        intervalHours: Int,
         durationDays: Int,
         startDate: Long
-    ) {
+    )
+    {
         binding.apply {
 
             // İlaç bilgileri
@@ -104,10 +104,12 @@ class MedicineDetailActivity : AppCompatActivity() {
             tvBarcode.text = barcode
 
             // Kullanım bilgileri
-            tvTimesPerDay.text = "$timesPerDay defa"
             tvStartTime.text = startTime
-            tvIntervalHours.text = "$intervalHours saat"
+            // Kullanım bilgileri
+            tvStartTime.text = startTime
+            tvTimesPerDay.text = if (timesPerDay > 0) "Günde ${24 / timesPerDay} defa" else "Bilgi yok"
             tvDurationDays.text = "$durationDays gün"
+
 
             val imageUrl = intent.getStringExtra("EXTRA_MEDICINE_IMAGE") ?: ""
             if (imageUrl.isNotEmpty()) {
@@ -139,19 +141,52 @@ class MedicineDetailActivity : AppCompatActivity() {
             }
 
             // Alarm saatleri listesi
-            val alarmTimes = calculateAlarmTimes(startTime, timesPerDay, intervalHours)
-            tvAlarmTimes.text = alarmTimes.joinToString("\n") { "🔔 $it" }
-        }
+            val alarmTimes = calculateAlarmTimes(startTime, timesPerDay)
+            tvAlarmTimes.text = "$timesPerDay defa içilecek"        }
     }
-
-    /**
-     * Kalan gün sayısını hesapla
-     */
     private fun calculateDaysRemaining(endDate: Long): Int {
         val currentTime = System.currentTimeMillis()
         val remainingMillis = endDate - currentTime
         val remainingDays = (remainingMillis / (1000 * 60 * 60 * 24)).toInt()
         return maxOf(0, remainingDays)
+    }
+
+    /**
+     * Kalan gün sayısını hesapla
+     */
+    private fun calculateAlarmTimes(
+        startTime: String,
+        timesPerDay: Int
+    ): List<String> {
+
+        if (timesPerDay <= 0) return emptyList()
+
+        val times = mutableListOf<String>()
+
+        val parts = startTime.split(":")
+        val hour = parts.getOrNull(0)?.toIntOrNull() ?: 0
+        val minute = parts.getOrNull(1)?.toIntOrNull() ?: 0
+
+        val intervalHours = 24 / timesPerDay
+
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, hour)
+            set(Calendar.MINUTE, minute)
+            set(Calendar.SECOND, 0)
+        }
+
+        repeat(timesPerDay) {
+            times.add(
+                String.format(
+                    "%02d:%02d",
+                    calendar.get(Calendar.HOUR_OF_DAY),
+                    calendar.get(Calendar.MINUTE)
+                )
+            )
+            calendar.add(Calendar.HOUR_OF_DAY, intervalHours)
+        }
+
+        return times
     }
 
     /**

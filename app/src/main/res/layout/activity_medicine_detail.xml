@@ -132,29 +132,7 @@
                             android:layout_marginBottom="16dp" />
 
                         <!-- Günde Kaç Defa -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="8dp">
 
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Günde:"
-                                android:textSize="18sp"
-                                android:textColor="@android:color/white" />
-
-                            <TextView
-                                android:id="@+id/tvTimesPerDay"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="2 defa"
-                                android:textSize="18sp"
-                                android:textStyle="bold"
-                                android:textColor="@android:color/white" />
-                        </LinearLayout>
 
                         <!-- İlk Doz -->
                         <LinearLayout
@@ -182,6 +160,8 @@
                         </LinearLayout>
 
                         <!-- Aralık Saatleri -->
+
+                        <!-- Günde Kaç Defa -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -192,19 +172,20 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Aralık:"
+                                android:text="Günde:"
                                 android:textSize="18sp"
                                 android:textColor="@android:color/white" />
 
                             <TextView
-                                android:id="@+id/tvIntervalHours"
+                                android:id="@+id/tvTimesPerDay"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="8 saat"
+                                android:text="2 defa"
                                 android:textSize="18sp"
                                 android:textStyle="bold"
                                 android:textColor="@android:color/white" />
                         </LinearLayout>
+
 
                         <!-- Süre -->
                         <LinearLayout

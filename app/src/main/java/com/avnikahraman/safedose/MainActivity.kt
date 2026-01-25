@@ -1,12 +1,15 @@
 package com.avnikahraman.safedose
 
 import android.Manifest
+import android.app.NotificationManager
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -15,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.avnikahraman.safedose.databinding.ActivityMainBinding
 import com.avnikahraman.safedose.repository.FirebaseRepository
+import com.avnikahraman.safedose.ui.alarm.AlarmActivity
 import com.avnikahraman.safedose.ui.auth.LoginActivity
 import com.avnikahraman.safedose.ui.auth.manual.UserManualActivity
 import com.avnikahraman.safedose.ui.medicines.MedicinesActivity
@@ -61,14 +65,10 @@ class MainActivity : AppCompatActivity() {
             navigateToLogin()
             return
         }
+
         binding.btnUserManual.setOnClickListener {
-            startActivity(
-                Intent(this, UserManualActivity::class.java)
-            )
+            startActivity(Intent(this, UserManualActivity::class.java))
         }
-
-
-
 
         val user = repository.getCurrentUser()
         if (user?.isEmailVerified == false) {
@@ -81,12 +81,55 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-
         copyManualPdfIfNotExists()
         checkNotificationPermission()
+        checkFullScreenIntentPermission() // YENİ: Full-screen intent izni kontrolü
         setupClickListeners()
         displayUserInfo()
     }
+
+    /**
+     * Full-Screen Intent iznini kontrol et (Android 14+)
+     */
+    private fun checkFullScreenIntentPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 14+
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            if (!notificationManager.canUseFullScreenIntent()) {
+                // Kullanıcıya bir kez sor
+                val sharedPrefs = getSharedPreferences("SafeDosePrefs", Context.MODE_PRIVATE)
+                val askedBefore = sharedPrefs.getBoolean("full_screen_intent_asked", false)
+
+                if (!askedBefore) {
+                    showFullScreenIntentPermissionDialog()
+                    sharedPrefs.edit().putBoolean("full_screen_intent_asked", true).apply()
+                }
+            }
+        }
+    }
+
+    /**
+     * Full-Screen Intent izni için dialog göster
+     */
+    private fun showFullScreenIntentPermissionDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Alarm İzni Gerekli")
+            .setMessage("Alarmların ekran kilidi üstünde çalışması için 'Tam ekran bildirimler' iznini vermeniz gerekiyor.\n\nBu izin olmadan alarm çaldığında bildirimi manuel olarak açmanız gerekecek.")
+            .setPositiveButton("Ayarlara Git") { _, _ ->
+                try {
+                    val intent = Intent(
+                        Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT,
+                        Uri.parse("package:$packageName")
+                    )
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Ayarlar açılamadı", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Daha Sonra", null)
+            .show()
+    }
+
     private fun copyManualPdfIfNotExists() {
         val pdfFile = File(filesDir, "manuel.pdf")
         if (!pdfFile.exists()) {
@@ -97,7 +140,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 
     private fun setupClickListeners() {
         // QR/Barkod Tarama
@@ -111,12 +153,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // RAPORLAR
-        // Raporlar butonu
+        // Raporlar
         binding.btnReports.setOnClickListener {
             val intent = Intent(this, ReportsActivity::class.java)
             startActivity(intent)
         }
+
         // Çıkış Yap
         binding.btnLogout.setOnClickListener {
             showLogoutDialog()
@@ -131,7 +173,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     private fun checkCameraPermissionAndOpenScanner() {
         when {
             ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED -> {
@@ -143,6 +184,18 @@ class MainActivity : AppCompatActivity() {
             else -> {
                 cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
             }
+        }
+    }
+    override fun onStart() {
+        super.onStart()
+
+        val prefs = getSharedPreferences("alarm_prefs", Context.MODE_PRIVATE)
+        val isAlarmActive = prefs.getBoolean("alarm_active_default", false)
+
+        if (isAlarmActive) {
+            val intent = Intent(this, AlarmActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            startActivity(intent)
         }
     }
 

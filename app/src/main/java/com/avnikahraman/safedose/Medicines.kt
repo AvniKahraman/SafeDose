@@ -151,7 +151,6 @@ class MedicinesActivity : AppCompatActivity() {
             putExtra(MedicineDetailActivity.EXTRA_MEDICINE_DOSAGE, medicine.dosage)
             putExtra(MedicineDetailActivity.EXTRA_MEDICINE_DESCRIPTION, medicine.description)
             putExtra(MedicineDetailActivity.EXTRA_MEDICINE_BARCODE, medicine.barcode)
-            putExtra(MedicineDetailActivity.EXTRA_MEDICINE_TIMES_PER_DAY, medicine.timesPerDay)
             putExtra(MedicineDetailActivity.EXTRA_MEDICINE_START_TIME, medicine.startTime)
             putExtra(MedicineDetailActivity.EXTRA_MEDICINE_INTERVAL_HOURS, medicine.intervalHours)
             putExtra(MedicineDetailActivity.EXTRA_MEDICINE_DURATION_DAYS, medicine.durationDays)

@@ -67,8 +67,7 @@ class MedicineAdapter(
                 }
 
                 // Kullanım bilgisi
-                val usageInfo = "Günde ${medicine.timesPerDay}x, ${medicine.intervalHours} saat aralıkla"
-                tvUsageInfo.text = usageInfo
+
 
                 // Başlangıç saati
                 tvStartTime.text = "İlk doz: ${medicine.startTime}"

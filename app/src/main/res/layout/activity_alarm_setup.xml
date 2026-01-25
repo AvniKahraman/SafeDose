@@ -112,10 +112,14 @@
                 android:layout_marginBottom="16dp" />
 
             <!-- Günde Kaç Defa -->
+
+
+            <!-- Kaç Saat Aralıkla -->
+            <!-- Günde Kaç Defa -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Günde Kaç Defa Kullanılacak?"
+                android:hint="Günde Kaç Defa İçilecek?"
                 android:layout_marginBottom="16dp">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -126,20 +130,6 @@
                     android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Kaç Saat Aralıkla -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Kaç Saat Aralıkla? (örn: 8)"
-                android:layout_marginBottom="16dp">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etIntervalHours"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:inputType="number" />
-            </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Kaç Gün Kullanılacak -->
             <com.google.android.material.textfield.TextInputLayout

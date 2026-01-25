@@ -2,11 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.avnikahraman.safedose">
+
     <!-- Camera Feature -->
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="false" /> <!-- İzinler -->
-    <uses-permission android:name="android.permission.INTERNET" />
+        android:required="false" />
+
+    <!-- İzinler -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -14,10 +16,12 @@
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+
 
     <application
         android:allowBackup="true"
@@ -29,24 +33,28 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SafeDose"
         tools:targetApi="31">
+
+        <!-- User Manual Activity -->
         <activity
             android:name=".ui.auth.manual.UserManualActivity"
             android:exported="false" />
 
+        <!-- Developer Info Activity -->
         <activity
             android:name=".ui.main.DeveloperInfoActivity"
             android:label="Hakkında"
             android:parentActivityName=".MainActivity">
-
-            <!-- Up (geri) butonu için -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
-        </activity> <!-- Reports Activity -->
+        </activity>
+
+        <!-- Reports Activity -->
         <activity
             android:name=".ui.reports.ReportsActivity"
             android:exported="false" />
 
+        <!-- File Provider -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -57,6 +65,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <!-- Boot Receiver -->
         <receiver
             android:name=".BootReceiver"
             android:enabled="true"
@@ -67,43 +76,72 @@
             </intent-filter>
         </receiver>
 
+        <!-- Alarm Receiver -->
+        <receiver
+            android:name=".utils.AlarmReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <service
+            android:name=".service.AlarmService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
+
+
+
+        <!-- Alarm Activity -->
         <activity
             android:name=".ui.alarm.AlarmActivity"
-            android:excludeFromRecents="true"
-            android:exported="false"
+            android:exported="true"
             android:showWhenLocked="true"
-            android:turnScreenOn="true" />
+            android:turnScreenOn="true"
+            android:launchMode="singleTop"
+            android:excludeFromRecents="true"
+            android:screenOrientation="portrait" />
+
+
+
+        <!-- Login Activity -->
         <activity
             android:name=".ui.auth.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- Register Activity -->
+        </activity>
+
+        <!-- Register Activity -->
         <activity
             android:name=".ui.auth.RegisterActivity"
             android:exported="false" />
+
+        <!-- Medicine Detail Activity -->
         <activity
             android:name=".ui.medicines.MedicineDetailActivity"
             android:exported="false" />
+
+        <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
-            android:exported="false" /> <!-- Scanner Activity -->
+            android:exported="false" />
+
+        <!-- Scanner Activity -->
         <activity
             android:name=".ui.auth.scanner.ScannerActivity"
-            android:exported="false" /> <!-- Alarm Setup Activity -->
+            android:exported="false" />
+
+        <!-- Alarm Setup Activity -->
         <activity
             android:name=".ui.alarm.AlarmSetupActivity"
-            android:exported="false" /> <!-- Medicines Activity -->
+            android:exported="false" />
+
+        <!-- Medicines Activity -->
         <activity
             android:name=".ui.medicines.MedicinesActivity"
-            android:exported="false" /> <!-- Medicine Detail Activity -->
-        <receiver
-            android:name=".utils.AlarmReceiver"
-            android:enabled="true"
             android:exported="false" />
+
     </application>
 
 </manifest>
